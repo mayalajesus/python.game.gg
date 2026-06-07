@@ -1,0 +1,86 @@
+﻿{
+    "id":  "onboarding_entrada_guilda",
+    "titulo":  "Entrada na Guilda",
+    "modulo":  "modulo-00-onboarding",
+    "semana":  0,
+    "ordem":  0,
+    "nivel":  "Onboarding",
+    "objetivo":  "Entender como funciona o python.game e concluir a entrada na guilda.",
+    "conceitos":  [
+                      "jornada",
+                      "xp",
+                      "cargos",
+                      "formato de entrega",
+                      "portfolio"
+                  ],
+    "projeto_relacionado":  "Juramento da Guilda",
+    "xp_sugerido":  50,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: onboarding_entrada_guilda",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

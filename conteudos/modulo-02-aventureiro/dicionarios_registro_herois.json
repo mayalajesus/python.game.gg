@@ -1,0 +1,85 @@
+﻿{
+    "id":  "dicionarios_registro_herois",
+    "titulo":  "Dicionarios - Registro dos Herois",
+    "modulo":  "modulo-02-aventureiro",
+    "semana":  7,
+    "ordem":  16,
+    "nivel":  "Python Basico",
+    "objetivo":  "Representar dados reais com chaves e valores.",
+    "conceitos":  [
+                      "dicionarios",
+                      "chave valor",
+                      "dados estruturados",
+                      "json mental model"
+                  ],
+    "projeto_relacionado":  "Painel de Membros da Guilda",
+    "xp_sugerido":  600,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: dicionarios_registro_herois",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

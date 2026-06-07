@@ -1,0 +1,86 @@
+﻿{
+    "id":  "automacao_scraping",
+    "titulo":  "Automacao e Web Scraping Basico",
+    "modulo":  "modulo-04-guardiao-dos-dados",
+    "semana":  13,
+    "ordem":  22,
+    "nivel":  "Dados Basico",
+    "objetivo":  "Automatizar tarefas e coletar dados simples da web.",
+    "conceitos":  [
+                      "automacao",
+                      "html",
+                      "beautifulsoup",
+                      "scraping",
+                      "etica"
+                  ],
+    "projeto_relacionado":  "Coletor de Dados da Guilda",
+    "xp_sugerido":  600,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: automacao_scraping",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

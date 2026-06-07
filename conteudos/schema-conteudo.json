@@ -1,0 +1,29 @@
+﻿{
+    "descricao":  "Modelo de arquivo JSON para cada conteudo da trilha python.game.",
+    "campos_obrigatorios":  [
+                                "id",
+                                "titulo",
+                                "modulo",
+                                "semana",
+                                "ordem",
+                                "nivel",
+                                "objetivo",
+                                "conceitos",
+                                "recomendacoes",
+                                "bot",
+                                "entrega",
+                                "validacao",
+                                "status"
+                            ],
+    "recomendacoes":  {
+                          "pdfs":  "Links de PDFs ou arquivos de apoio.",
+                          "videos":  "Links de aulas, lives ou tutoriais em video.",
+                          "artigos":  "Links de artigos e posts.",
+                          "sites_oficiais":  "Links de sites oficiais de ferramentas, linguagens ou bibliotecas.",
+                          "documentacao":  "Links diretos para documentacoes oficiais.",
+                          "cursos":  "Links de cursos gratuitos ou pagos.",
+                          "repositorios":  "Links de repositorios GitHub ou exemplos de codigo.",
+                          "ferramentas":  "Links de ferramentas que o aluno deve instalar ou usar.",
+                          "outros":  "Qualquer outro recurso util."
+                      }
+}

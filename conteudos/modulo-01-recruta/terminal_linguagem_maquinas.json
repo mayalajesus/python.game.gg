@@ -1,0 +1,85 @@
+﻿{
+    "id":  "terminal_linguagem_maquinas",
+    "titulo":  "O Terminal - A Linguagem das Maquinas",
+    "modulo":  "modulo-01-recruta",
+    "semana":  1,
+    "ordem":  1,
+    "nivel":  "Fundamentos",
+    "objetivo":  "Aprender a navegar no computador usando linha de comando.",
+    "conceitos":  [
+                      "terminal",
+                      "navegacao",
+                      "pastas",
+                      "comandos"
+                  ],
+    "projeto_relacionado":  "Base da Guilda",
+    "xp_sugerido":  100,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: terminal_linguagem_maquinas",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

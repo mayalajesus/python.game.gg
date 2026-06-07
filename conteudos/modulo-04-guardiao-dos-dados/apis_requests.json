@@ -1,0 +1,86 @@
+﻿{
+    "id":  "apis_requests",
+    "titulo":  "APIs - Portais Externos",
+    "modulo":  "modulo-04-guardiao-dos-dados",
+    "semana":  12,
+    "ordem":  21,
+    "nivel":  "Dados Basico",
+    "objetivo":  "Consumir APIs publicas e extrair dados.",
+    "conceitos":  [
+                      "api",
+                      "http",
+                      "requests",
+                      "status code",
+                      "json"
+                  ],
+    "projeto_relacionado":  "Invocador de APIs",
+    "xp_sugerido":  300,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: apis_requests",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

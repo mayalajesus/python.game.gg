@@ -1,0 +1,89 @@
+﻿{
+    "id":  "python_avancado_essencial",
+    "titulo":  "Python Avancado Essencial",
+    "modulo":  "modulo-05-arquiteto-de-classes",
+    "semana":  16,
+    "ordem":  25,
+    "nivel":  "Python Avancado",
+    "objetivo":  "Aplicar recursos avancados essenciais em projetos reais.",
+    "conceitos":  [
+                      "comprehensions",
+                      "lambda",
+                      "map",
+                      "filter",
+                      "sorted",
+                      "datetime",
+                      "logging",
+                      "type hints"
+                  ],
+    "projeto_relacionado":  "Core do Bot em Python",
+    "xp_sugerido":  600,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: python_avancado_essencial",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}

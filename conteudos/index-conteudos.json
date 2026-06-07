@@ -1,0 +1,243 @@
+﻿{
+    "total":  34,
+    "conteudos":  [
+                      {
+                          "id":  "onboarding_entrada_guilda",
+                          "titulo":  "Entrada na Guilda",
+                          "modulo":  "modulo-00-onboarding",
+                          "semana":  0,
+                          "arquivo":  "modulo-00-onboarding/onboarding_entrada_guilda.json"
+                      },
+                      {
+                          "id":  "terminal_linguagem_maquinas",
+                          "titulo":  "O Terminal - A Linguagem das Maquinas",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  1,
+                          "arquivo":  "modulo-01-recruta/terminal_linguagem_maquinas.json"
+                      },
+                      {
+                          "id":  "setup_python_vscode",
+                          "titulo":  "Forjando a Espada - Python e VS Code",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  1,
+                          "arquivo":  "modulo-01-recruta/setup_python_vscode.json"
+                      },
+                      {
+                          "id":  "print_primeiro_script",
+                          "titulo":  "O Primeiro Feitico - print",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  1,
+                          "arquivo":  "modulo-01-recruta/print_primeiro_script.json"
+                      },
+                      {
+                          "id":  "comentarios_documentacao",
+                          "titulo":  "Comentarios e Diario do Aventureiro",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  1,
+                          "arquivo":  "modulo-01-recruta/comentarios_documentacao.json"
+                      },
+                      {
+                          "id":  "variaveis_baus_memoria",
+                          "titulo":  "Variaveis - Baus de Memoria",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  1,
+                          "arquivo":  "modulo-01-recruta/variaveis_baus_memoria.json"
+                      },
+                      {
+                          "id":  "tipos_basicos",
+                          "titulo":  "Tipos de Dados Basicos",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  2,
+                          "arquivo":  "modulo-01-recruta/tipos_basicos.json"
+                      },
+                      {
+                          "id":  "operadores_matematicos",
+                          "titulo":  "Operadores Matematicos",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  2,
+                          "arquivo":  "modulo-01-recruta/operadores_matematicos.json"
+                      },
+                      {
+                          "id":  "fstrings_textos",
+                          "titulo":  "Magia com Textos - F-Strings",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  2,
+                          "arquivo":  "modulo-01-recruta/fstrings_textos.json"
+                      },
+                      {
+                          "id":  "input_entrada_dados",
+                          "titulo":  "Ouvindo o Mundo Externo - input",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  2,
+                          "arquivo":  "modulo-01-recruta/input_entrada_dados.json"
+                      },
+                      {
+                          "id":  "casting_conversao_tipos",
+                          "titulo":  "Transformacao de Materia - Casting",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  2,
+                          "arquivo":  "modulo-01-recruta/casting_conversao_tipos.json"
+                      },
+                      {
+                          "id":  "booleanos_relacionais",
+                          "titulo":  "Booleanos e Operadores Relacionais",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  4,
+                          "arquivo":  "modulo-01-recruta/booleanos_relacionais.json"
+                      },
+                      {
+                          "id":  "operadores_logicos",
+                          "titulo":  "Encruzilhadas Logicas",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  4,
+                          "arquivo":  "modulo-01-recruta/operadores_logicos.json"
+                      },
+                      {
+                          "id":  "condicionais_if_else_elif",
+                          "titulo":  "Condicionais - if, else e elif",
+                          "modulo":  "modulo-01-recruta",
+                          "semana":  4,
+                          "arquivo":  "modulo-01-recruta/condicionais_if_else_elif.json"
+                      },
+                      {
+                          "id":  "loops_repeticao",
+                          "titulo":  "Loops - A Roda das Missoes",
+                          "modulo":  "modulo-02-aventureiro",
+                          "semana":  5,
+                          "arquivo":  "modulo-02-aventureiro/loops_repeticao.json"
+                      },
+                      {
+                          "id":  "listas_tuplas",
+                          "titulo":  "Listas e Tuplas - Inventario Organizado",
+                          "modulo":  "modulo-02-aventureiro",
+                          "semana":  6,
+                          "arquivo":  "modulo-02-aventureiro/listas_tuplas.json"
+                      },
+                      {
+                          "id":  "dicionarios_registro_herois",
+                          "titulo":  "Dicionarios - Registro dos Herois",
+                          "modulo":  "modulo-02-aventureiro",
+                          "semana":  7,
+                          "arquivo":  "modulo-02-aventureiro/dicionarios_registro_herois.json"
+                      },
+                      {
+                          "id":  "funcoes_reutilizaveis",
+                          "titulo":  "Funcoes - Feiticos Reutilizaveis",
+                          "modulo":  "modulo-03-mago-das-funcoes",
+                          "semana":  8,
+                          "arquivo":  "modulo-03-mago-das-funcoes/funcoes_reutilizaveis.json"
+                      },
+                      {
+                          "id":  "erros_excecoes_debug",
+                          "titulo":  "Erros, Excecoes e Depuracao",
+                          "modulo":  "modulo-03-mago-das-funcoes",
+                          "semana":  9,
+                          "arquivo":  "modulo-03-mago-das-funcoes/erros_excecoes_debug.json"
+                      },
+                      {
+                          "id":  "modulos_pacotes_git",
+                          "titulo":  "Modulos, Pacotes e Git",
+                          "modulo":  "modulo-03-mago-das-funcoes",
+                          "semana":  10,
+                          "arquivo":  "modulo-03-mago-das-funcoes/modulos_pacotes_git.json"
+                      },
+                      {
+                          "id":  "arquivos_csv_json",
+                          "titulo":  "Arquivos, CSV e JSON",
+                          "modulo":  "modulo-04-guardiao-dos-dados",
+                          "semana":  11,
+                          "arquivo":  "modulo-04-guardiao-dos-dados/arquivos_csv_json.json"
+                      },
+                      {
+                          "id":  "apis_requests",
+                          "titulo":  "APIs - Portais Externos",
+                          "modulo":  "modulo-04-guardiao-dos-dados",
+                          "semana":  12,
+                          "arquivo":  "modulo-04-guardiao-dos-dados/apis_requests.json"
+                      },
+                      {
+                          "id":  "automacao_scraping",
+                          "titulo":  "Automacao e Web Scraping Basico",
+                          "modulo":  "modulo-04-guardiao-dos-dados",
+                          "semana":  13,
+                          "arquivo":  "modulo-04-guardiao-dos-dados/automacao_scraping.json"
+                      },
+                      {
+                          "id":  "orientacao_objetos",
+                          "titulo":  "Orientacao a Objetos",
+                          "modulo":  "modulo-05-arquiteto-de-classes",
+                          "semana":  14,
+                          "arquivo":  "modulo-05-arquiteto-de-classes/orientacao_objetos.json"
+                      },
+                      {
+                          "id":  "testes_qualidade",
+                          "titulo":  "Testes e Qualidade",
+                          "modulo":  "modulo-05-arquiteto-de-classes",
+                          "semana":  15,
+                          "arquivo":  "modulo-05-arquiteto-de-classes/testes_qualidade.json"
+                      },
+                      {
+                          "id":  "python_avancado_essencial",
+                          "titulo":  "Python Avancado Essencial",
+                          "modulo":  "modulo-05-arquiteto-de-classes",
+                          "semana":  16,
+                          "arquivo":  "modulo-05-arquiteto-de-classes/python_avancado_essencial.json"
+                      },
+                      {
+                          "id":  "sql_bancos_dados",
+                          "titulo":  "SQL e Bancos de Dados",
+                          "modulo":  "modulo-06-analista-arcano",
+                          "semana":  17,
+                          "arquivo":  "modulo-06-analista-arcano/sql_bancos_dados.json"
+                      },
+                      {
+                          "id":  "pandas_dados",
+                          "titulo":  "Pandas - Manipulando Dados",
+                          "modulo":  "modulo-06-analista-arcano",
+                          "semana":  18,
+                          "arquivo":  "modulo-06-analista-arcano/pandas_dados.json"
+                      },
+                      {
+                          "id":  "visualizacao_analise",
+                          "titulo":  "Visualizacao e Analise",
+                          "modulo":  "modulo-06-analista-arcano",
+                          "semana":  19,
+                          "arquivo":  "modulo-06-analista-arcano/visualizacao_analise.json"
+                      },
+                      {
+                          "id":  "etl_pipelines",
+                          "titulo":  "ETL e Pipelines",
+                          "modulo":  "modulo-07-engenheiro-da-guilda",
+                          "semana":  20,
+                          "arquivo":  "modulo-07-engenheiro-da-guilda/etl_pipelines.json"
+                      },
+                      {
+                          "id":  "modelagem_carga_banco",
+                          "titulo":  "Banco, Modelagem e Carga",
+                          "modulo":  "modulo-07-engenheiro-da-guilda",
+                          "semana":  21,
+                          "arquivo":  "modulo-07-engenheiro-da-guilda/modelagem_carga_banco.json"
+                      },
+                      {
+                          "id":  "docker_cli_orquestracao",
+                          "titulo":  "Docker, CLI e Orquestracao Intro",
+                          "modulo":  "modulo-07-engenheiro-da-guilda",
+                          "semana":  22,
+                          "arquivo":  "modulo-07-engenheiro-da-guilda/docker_cli_orquestracao.json"
+                      },
+                      {
+                          "id":  "python_avancado_dados",
+                          "titulo":  "Python Avancado para Engenharia de Dados",
+                          "modulo":  "modulo-08-mestre-dos-dados",
+                          "semana":  23,
+                          "arquivo":  "modulo-08-mestre-dos-dados/python_avancado_dados.json"
+                      },
+                      {
+                          "id":  "projeto_final_guild_analytics",
+                          "titulo":  "Projeto Final - Guild Analytics Platform",
+                          "modulo":  "modulo-08-mestre-dos-dados",
+                          "semana":  24,
+                          "arquivo":  "modulo-08-mestre-dos-dados/projeto_final_guild_analytics.json"
+                      }
+                  ]
+}

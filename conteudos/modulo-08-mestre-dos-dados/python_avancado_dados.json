@@ -1,0 +1,88 @@
+﻿{
+    "id":  "python_avancado_dados",
+    "titulo":  "Python Avancado para Engenharia de Dados",
+    "modulo":  "modulo-08-mestre-dos-dados",
+    "semana":  23,
+    "ordem":  32,
+    "nivel":  "Python Avancado",
+    "objetivo":  "Usar recursos avancados de Python em pipelines e sistemas de dados.",
+    "conceitos":  [
+                      "decorators",
+                      "generators",
+                      "context managers",
+                      "dataclasses",
+                      "pydantic",
+                      "async",
+                      "performance"
+                  ],
+    "projeto_relacionado":  "Motor Avancado de Pipeline",
+    "xp_sugerido":  600,
+    "recomendacoes":  {
+                          "pdfs":  [
+
+                                   ],
+                          "videos":  [
+
+                                     ],
+                          "artigos":  [
+
+                                      ],
+                          "sites_oficiais":  [
+
+                                             ],
+                          "documentacao":  [
+
+                                           ],
+                          "cursos":  [
+
+                                     ],
+                          "repositorios":  [
+
+                                           ],
+                          "ferramentas":  [
+
+                                          ],
+                          "outros":  [
+
+                                     ]
+                      },
+    "bot":  {
+                "mensagem_curta":  "",
+                "antes_da_missao":  [
+
+                                    ],
+                "exercicio_aquecimento":  "",
+                "reforco_se_erro":  [
+
+                                    ],
+                "criterio_para_liberar_missao":  [
+                                                     "aluno concluiu onboarding",
+                                                     "aluno visualizou recomendacoes do conteudo"
+                                                 ]
+            },
+    "entrega":  {
+                    "formato_obrigatorio":  "/entregar desafio_id: python_avancado_dados",
+                    "exigir_codigo":  true,
+                    "exigir_explicacao":  true,
+                    "exigir_repositorio":  false
+                },
+    "validacao":  {
+                      "resultado_correto":  true,
+                      "uso_adequado_dos_conceitos":  true,
+                      "legibilidade":  true,
+                      "organizacao":  true,
+                      "formato_correto":  true,
+                      "testes_automaticos":  [
+
+                                             ],
+                      "criterios_manuais":  [
+
+                                            ]
+                  },
+    "status":  {
+                   "ativo":  true,
+                   "revisado":  false,
+                   "links_adicionados":  false
+               },
+    "observacoes_internas":  ""
+}
