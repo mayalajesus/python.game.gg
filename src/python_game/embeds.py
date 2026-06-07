@@ -29,12 +29,6 @@ def mission_embed(content: TrailContent, has_materials: bool) -> discord.Embed:
     embed.add_field(name="Projeto relacionado", value=content.raw.get("projeto_relacionado", "Missao pratica"), inline=False)
     if has_materials:
         embed.add_field(name="📚 Materiais", value="Ha links cadastrados para apoiar esta missao.", inline=False)
-    else:
-        embed.add_field(
-            name="📚 Materiais",
-            value="Nenhum link foi cadastrado ainda. A missao continua liberada pelo objetivo e criterios internos.",
-            inline=False,
-        )
     embed.set_footer(text="python.game • complete missoes, ganhe XP, construa portfolio")
     return embed
 
@@ -70,4 +64,3 @@ def feedback_embed(title: str, score: int, accepted: bool, strengths: tuple[str,
     embed.add_field(name="Pontos fortes", value="\n".join(f"- {item}" for item in strengths[:4]) or "-", inline=False)
     embed.add_field(name="Proximos ajustes", value="\n".join(f"- {item}" for item in improvements[:4]) or "-", inline=False)
     return embed
-

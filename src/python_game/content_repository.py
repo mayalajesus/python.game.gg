@@ -101,9 +101,6 @@ def format_recommendations(content: TrailContent) -> str:
         lines.extend(f"- {link}" for link in links)
         lines.append("")
 
-    if not has_links:
-        lines.append("Ainda nao existem links cadastrados para este conteudo.")
-
     return "\n".join(lines).strip()
 
 

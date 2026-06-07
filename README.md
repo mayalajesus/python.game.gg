@@ -83,7 +83,7 @@ Os demais campos dos JSONs sao parte da trilha e devem permanecer como definidos
 - `/registrar_projeto`: adiciona projeto ao portfolio interno.
 - `/portfolio`: lista os projetos registrados.
 
-Os materiais de estudo sao opcionais. Se os links ainda nao foram adicionados, o bot continua guiando o aluno pelo objetivo, criterios da missao, entrega e feedback.
+Os materiais de estudo sao opcionais. O bot sempre guia o aluno pelo objetivo, criterios da missao, entrega e feedback.
 
 ## Banco de dados
 

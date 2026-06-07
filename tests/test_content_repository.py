@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from python_game.content_repository import ContentRepository
+from python_game.content_repository import ContentRepository, format_recommendations
 from python_game.database import GameDatabase
 from python_game.delivery_validation import validate_delivery_format
 from python_game.evaluator import evaluate_submission
@@ -27,6 +27,16 @@ def test_loads_single_content() -> None:
 
     assert content.title == "Variaveis - Baus de Memoria"
     assert "variaveis" in content.raw["conceitos"]
+
+
+def test_empty_recommendations_do_not_announce_missing_materials() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    content = repository.get_content("variaveis_baus_memoria")
+
+    message = format_recommendations(content)
+
+    assert "Ainda nao existem" not in message
+    assert "Nenhum link" not in message
 
 
 def test_content_files_do_not_expose_extra_manual_fields() -> None:
