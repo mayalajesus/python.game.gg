@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 
-from python_game.content_repository import ContentRepository, format_recommendations, has_recommendation_links
+from python_game.content_repository import ContentRepository, TrailContent, format_recommendations, has_recommendation_links
 from python_game.database import GameDatabase
 from python_game.delivery_validation import validate_delivery_format
 from python_game.discord_helpers import require_guild, require_member, sync_member_rank
 from python_game.embeds import feedback_embed, mission_embed
 from python_game.evaluator import evaluate_submission
 from python_game.ranks import rank_for_xp
+from python_game.views import MissionFeedView
 
 
 class TrailCog(commands.Cog):
@@ -18,6 +19,19 @@ class TrailCog(commands.Cog):
         self.bot = bot
         self.contents = contents
         self.database = database
+        self.refresh_rankings.start()
+
+    def cog_unload(self) -> None:
+        self.refresh_rankings.cancel()
+
+    @tasks.loop(hours=24)
+    async def refresh_rankings(self) -> None:
+        for guild in self.bot.guilds:
+            await self._publish_ranking_board(guild)
+
+    @refresh_rankings.before_loop
+    async def before_refresh_rankings(self) -> None:
+        await self.bot.wait_until_ready()
 
     @app_commands.command(name="trilha", description="Lista os conteudos cadastrados na trilha.")
     async def trilha(self, interaction: discord.Interaction) -> None:
@@ -114,6 +128,7 @@ class TrailCog(commands.Cog):
 
         xp_awarded = 0
         new_rank_message = ""
+        next_content = None
         if evaluation.accepted and submission.first_completion:
             xp_awarded = int(content.raw.get("xp_sugerido", 100))
             updated = self.database.add_xp(
@@ -129,6 +144,7 @@ class TrailCog(commands.Cog):
                 new_rank_message = f"\n🏅 Novo rank conquistado: **{synced_rank}**"
             next_content_id = self.contents.next_content_id(content.id)
             if next_content_id:
+                next_content = self.contents.get_content(next_content_id)
                 self.database.set_active_content(member.id, guild.id, next_content_id)
 
         embed = feedback_embed(
@@ -144,6 +160,11 @@ class TrailCog(commands.Cog):
             embed=embed,
             ephemeral=True,
         )
+        if evaluation.accepted and submission.first_completion:
+            await self._publish_achievement(guild, member, content.title, xp_awarded)
+            await self._publish_ranking_board(guild)
+            if next_content:
+                await self._publish_mission_feed(guild, next_content)
 
     @app_commands.command(name="validar_entrega", description="Valida se uma entrega textual esta no formato correto.")
     async def validar_entrega(self, interaction: discord.Interaction, texto: str) -> None:
@@ -207,6 +228,9 @@ class TrailCog(commands.Cog):
             ephemeral=True,
         )
 
+        await self._publish_achievement(guild, member, f"Projeto publicado: {titulo}", 50)
+        await self._publish_ranking_board(guild)
+
     @app_commands.command(name="portfolio", description="Mostra seus projetos registrados.")
     async def portfolio(self, interaction: discord.Interaction) -> None:
         guild = require_guild(interaction)
@@ -223,9 +247,114 @@ class TrailCog(commands.Cog):
             lines.append(f"- **{project['title']}** (`{project['content_id']}`): {project['repository_url']}")
         await interaction.response.send_message("\n".join(lines), ephemeral=True)
 
+    async def _publish_achievement(
+        self,
+        guild: discord.Guild,
+        member: discord.Member,
+        achievement_name: str,
+        xp_awarded: int,
+    ) -> None:
+        channel = self._configured_text_channel(guild, "announcements")
+        if channel is None:
+            return
+
+        embed = discord.Embed(
+            title="🏆 Conquista Desbloqueada",
+            description=(
+                f"**Usuário:**\n{member.mention}\n\n"
+                f"**Conquista:**\n{achievement_name}\n\n"
+                f"**Descrição:**\nConcluiu uma etapa da campanha e fortaleceu o próprio portfólio.\n\n"
+                f"**Recompensa:**\n+{xp_awarded} XP"
+            ),
+            color=0xF2C94C,
+        )
+        embed.set_footer(text="python.game.gg • conquista")
+        await channel.send(embed=embed)
+
+    async def _publish_ranking_board(self, guild: discord.Guild) -> None:
+        channel = self._configured_text_channel(guild, "ranking")
+        if channel is None:
+            return
+
+        players = self.database.leaderboard(guild.id)
+        lines = ["**Ranking da Guilda**"]
+        if players:
+            medals = ("🥇", "🥈", "🥉")
+            for index, player in enumerate(players[:10], start=1):
+                prefix = medals[index - 1] if index <= len(medals) else f"{index}."
+                lines.append(f"{prefix} **{player.hero_name}** — {player.xp} XP")
+        else:
+            lines.extend(
+                [
+                    "🥇 Aguardando o primeiro nome",
+                    "🥈 Aguardando o próximo avanço",
+                    "🥉 Aguardando uma nova conquista",
+                ]
+            )
+
+        permissions = channel.permissions_for(guild.me) if guild.me else None
+        if permissions and permissions.manage_messages:
+            try:
+                await channel.purge(
+                    limit=50,
+                    check=lambda message: (
+                        message.author == guild.me
+                        and bool(message.embeds)
+                        and message.embeds[0].footer.text in {"python.game.gg • ranking", "python.game.gg • setup"}
+                    ),
+                )
+            except discord.HTTPException:
+                pass
+
+        embed = discord.Embed(title="🏆 ▣ Ranking da Guilda", description="\n".join(lines), color=0xF2C94C)
+        embed.set_footer(text="python.game.gg • ranking")
+        await channel.send(embed=embed)
+
+    async def _publish_mission_feed(self, guild: discord.Guild, content: TrailContent) -> None:
+        channel = self._configured_text_channel(guild, "trail")
+        if channel is None:
+            return
+
+        marker = f"python.game.gg • mission:{content.id}"
+        async for message in channel.history(limit=75):
+            if message.author == guild.me and message.embeds and message.embeds[0].footer.text == marker:
+                return
+
+        embed = self._mission_feed_embed(content)
+        embed.set_footer(text=marker)
+        await channel.send(embed=embed, view=MissionFeedView(self.database))
+
+    def _configured_text_channel(self, guild: discord.Guild, key: str) -> discord.TextChannel | None:
+        settings = self.database.guild_settings(guild.id)
+        channel_id = settings.get(key)
+        channel = guild.get_channel(channel_id) if channel_id else None
+        return channel if isinstance(channel, discord.TextChannel) else None
+
+    @staticmethod
+    def _mission_feed_embed(content: TrailContent) -> discord.Embed:
+        mission_number = max(1, content.order + 1)
+        embed = discord.Embed(
+            title=f"📜 MISSÃO {mission_number:02d}",
+            description=(
+                f"**Nome:**\n{content.title}\n\n"
+                f"**Objetivo:**\n{content.objective}\n\n"
+                f"**Recompensa:**\n+{content.raw.get('xp_sugerido', 100)} XP"
+            ),
+            color=0x4EA5FF,
+        )
+        embed.add_field(name="Selo da missão", value=f"`{content.id}`", inline=True)
+        embed.add_field(name="Entrega", value="Use o botão quando estiver pronto para ver o modelo.", inline=False)
+        return embed
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
         if message.author.bot or message.guild is None:
+            return
+        if self._is_delivery_channel(message) and self._looks_like_delivery_card(message.content):
+            await message.reply(
+                "📦 Entrega recebida no modelo da Guilda. Para correção técnica, XP e progressão automática, use também `/entregar`.",
+                mention_author=False,
+            )
             return
         if not message.content.strip().lower().startswith("/entregar"):
             return
@@ -236,4 +365,19 @@ class TrailCog(commands.Cog):
         await message.reply(
             "✅ O selo de formato esta correto. Para registrar XP e receber feedback completo, use o comando slash `/entregar`.",
             mention_author=False,
+        )
+
+    def _is_delivery_channel(self, message: discord.Message) -> bool:
+        if message.guild is None:
+            return False
+        settings = self.database.guild_settings(message.guild.id)
+        return settings.get("deliveries") == message.channel.id
+
+    @staticmethod
+    def _looks_like_delivery_card(content: str) -> bool:
+        normalized = content.lower()
+        return (
+            ("missão:" in normalized or "missao:" in normalized)
+            and "github:" in normalized
+            and ("observações:" in normalized or "observacoes:" in normalized)
         )

@@ -6,9 +6,9 @@ from discord.ext import commands
 
 from python_game.content_repository import ContentRepository, has_recommendation_links
 from python_game.database import GameDatabase
-from python_game.discord_helpers import require_guild, require_member, sync_member_rank
+from python_game.discord_helpers import require_guild, require_member
 from python_game.embeds import mission_embed, profile_embed
-from python_game.ranks import RANKS
+from python_game.game_service import start_player_journey
 
 
 class OnboardingCog(commands.Cog):
@@ -21,35 +21,28 @@ class OnboardingCog(commands.Cog):
     async def iniciar(self, interaction: discord.Interaction, nome: str | None = None) -> None:
         guild = require_guild(interaction)
         member = require_member(interaction)
-        hero_name = (nome or member.display_name).strip()[:40]
-        first_content_id = self.contents.first_content_id()
-
-        player = self.database.upsert_player(
-            discord_id=member.id,
-            guild_id=guild.id,
-            display_name=member.display_name,
-            hero_name=hero_name,
-            rank_role=RANKS[0].role_name,
-            active_content_id=first_content_id,
+        result = await start_player_journey(
+            member=member,
+            contents=self.contents,
+            database=self.database,
+            hero_name=nome,
         )
-        rank_role = await sync_member_rank(member, player.xp)
-        if rank_role != player.rank_role:
-            player = self.database.add_xp(
-                discord_id=member.id,
-                guild_id=guild.id,
-                amount=0,
-                reason="rank sync",
-                rank_role=rank_role,
-            )
 
-        content = self.contents.get_content(player.active_content_id or first_content_id)
+        settings = self.database.guild_settings(guild.id)
+        trail_channel = guild.get_channel(settings["trail"]) if settings["trail"] else None
+        trail_hint = trail_channel.mention if isinstance(trail_channel, discord.TextChannel) else "#🧩-trilha-python"
+        intro = "Seu registro foi aceso no Livro da Guilda." if result.is_new_player else "Seu registro já estava aceso."
+        xp_line = f"⭐ XP inicial recebido: **+{result.xp_awarded} XP**" if result.xp_awarded else "⭐ XP inicial já registrado."
+
         await interaction.response.send_message(
             (
-                f"🥚 **{player.hero_name}, seu nome foi gravado no Registro da Guilda.**\n\n"
-                "A primeira marca do seu mapa acendeu. A partir daqui, cada entrega conta: "
-                "pergunte, ajude, mostre progresso e avance com a comunidade."
+                f"🏰 **{result.player.hero_name}, você agora é Aprendiz da Python.Game.**\n\n"
+                f"{intro}\n"
+                "🎒 Cargo liberado: **Aprendiz**\n"
+                f"{xp_line}\n"
+                f"📜 Primeira missão: {trail_hint}"
             ),
-            embed=mission_embed(content, has_recommendation_links(content)),
+            embed=mission_embed(result.content, has_recommendation_links(result.content)),
             ephemeral=True,
         )
 
@@ -58,7 +51,7 @@ class OnboardingCog(commands.Cog):
         await interaction.response.send_message(
             (
                 "📜 **Formato oficial de entrega**\n\n"
-                "O avaliador da Guilda so abre a correcao quando a missao chega neste formato:\n\n"
+                "O avaliador da Guilda só abre a correção quando a missão chega neste formato:\n\n"
                 "````text\n"
                 "/entregar desafio_id: fundamentos_01\n\n"
                 "Codigo:\n"
@@ -68,7 +61,7 @@ class OnboardingCog(commands.Cog):
                 "Explicacao:\n"
                 "Explique em poucas linhas como sua solucao funciona.\n"
                 "````\n\n"
-                "Clareza tambem faz parte da missao."
+                "Clareza também faz parte da missão."
             ),
             ephemeral=True,
         )
@@ -80,7 +73,7 @@ class OnboardingCog(commands.Cog):
         player = self.database.get_player(member.id, guild.id)
         if player is None:
             await interaction.response.send_message(
-                "Seu nome ainda nao apareceu no Registro da Guilda. Use `/iniciar` para abrir sua campanha.",
+                "Seu nome ainda não apareceu no Registro da Guilda. Use `/iniciar` para abrir sua campanha.",
                 ephemeral=True,
             )
             return
@@ -97,10 +90,10 @@ class OnboardingCog(commands.Cog):
                 "🎮 **Painel da Guilda**\n\n"
                 "`/setup_servidor` ergue a estrutura da campanha.\n"
                 "`/iniciar` grava seu nome no Registro da Guilda.\n"
-                "`/missao` mostra ou troca o capitulo ativo.\n"
-                "`/conteudo` abre a biblioteca da missao.\n"
-                "`/entregar` envia sua solucao para avaliacao.\n"
-                "`/perfil` mostra sua cronica: XP, rank e progresso.\n"
+                "`/missao` mostra ou troca o capítulo ativo.\n"
+                "`/conteudo` abre a biblioteca da missão.\n"
+                "`/entregar` envia sua solução para avaliação.\n"
+                "`/perfil` mostra sua crônica: XP, rank e progresso.\n"
                 "`/ranking` revela o placar da Guilda.\n"
                 "`/registrar_projeto` coloca uma entrega na sua vitrine.\n"
             ),

@@ -5,6 +5,16 @@ import discord
 from python_game.ranks import RANKS, rank_for_xp
 
 
+ACCESS_ROLE_NAME = "🎒 Aprendiz"
+
+
+async def ensure_access_role(guild: discord.Guild) -> discord.Role:
+    role = discord.utils.get(guild.roles, name=ACCESS_ROLE_NAME)
+    if role is None:
+        role = await guild.create_role(name=ACCESS_ROLE_NAME, reason="python.game access setup")
+    return role
+
+
 async def ensure_rank_roles(guild: discord.Guild) -> dict[str, discord.Role]:
     roles: dict[str, discord.Role] = {}
     for rank in RANKS:
@@ -13,6 +23,13 @@ async def ensure_rank_roles(guild: discord.Guild) -> dict[str, discord.Role]:
             role = await guild.create_role(name=rank.role_name, reason="python.game rank setup")
         roles[rank.role_name] = role
     return roles
+
+
+async def grant_access_role(member: discord.Member) -> discord.Role:
+    role = await ensure_access_role(member.guild)
+    if role not in member.roles:
+        await member.add_roles(role, reason="python.game onboarding")
+    return role
 
 
 async def sync_member_rank(member: discord.Member, xp: int) -> str:
@@ -39,4 +56,3 @@ def require_member(interaction: discord.Interaction) -> discord.Member:
     if not isinstance(interaction.user, discord.Member):
         raise RuntimeError("Nao foi possivel identificar o membro no servidor.")
     return interaction.user
-

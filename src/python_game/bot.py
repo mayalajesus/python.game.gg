@@ -13,6 +13,7 @@ from python_game.cogs.trail import TrailCog
 from python_game.content_repository import ContentRepository
 from python_game.database import GameDatabase
 from python_game.settings import load_settings
+from python_game.views import MissionFeedView, StartJourneyView
 
 
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +33,10 @@ class PythonGameBot(commands.Bot):
         self.database = GameDatabase(settings.database_path)
 
     async def setup_hook(self) -> None:
-        await self.add_cog(SetupCog(self, self.database))
+        self.add_view(StartJourneyView(self.contents, self.database))
+        self.add_view(MissionFeedView(self.database))
+
+        await self.add_cog(SetupCog(self, self.contents, self.database))
         await self.add_cog(ModerationCog(self, self.database))
         await self.add_cog(OnboardingCog(self, self.contents, self.database))
         await self.add_cog(TrailCog(self, self.contents, self.database))

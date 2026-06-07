@@ -4,29 +4,35 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 
+from python_game.content_repository import ContentRepository, TrailContent
 from python_game.database import GameDatabase
-from python_game.discord_helpers import ensure_rank_roles, require_guild
+from python_game.discord_helpers import ensure_access_role, ensure_rank_roles, require_guild
+from python_game.views import MissionFeedView, PortalView, StartJourneyView
+
+
+SETUP_MARKER = "python.game.gg • setup"
 
 
 class SetupCog(commands.Cog):
-    def __init__(self, bot: commands.Bot, database: GameDatabase) -> None:
+    def __init__(self, bot: commands.Bot, contents: ContentRepository, database: GameDatabase) -> None:
         self.bot = bot
+        self.contents = contents
         self.database = database
 
-    @app_commands.command(name="setup_servidor", description="Cria a estrutura minimalista da Guilda python.game.")
+    @app_commands.command(name="setup_servidor", description="Cria a jornada guiada da Guilda python.game.")
     @app_commands.checks.has_permissions(administrator=True)
     async def setup_servidor(self, interaction: discord.Interaction) -> None:
         guild = require_guild(interaction)
         await interaction.response.defer(ephemeral=True, thinking=True)
 
-        roles = await ensure_rank_roles(guild)
-        novato_role = roles["🥚 Novato"]
+        await ensure_rank_roles(guild)
+        apprentice_role = await ensure_access_role(guild)
         everyone = guild.default_role
         bot_member = guild.me
 
         start_read_only = self._overwrites(
-            everyone_role=everyone,
-            everyone_overwrite=discord.PermissionOverwrite(
+            everyone,
+            discord.PermissionOverwrite(
                 view_channel=True,
                 read_message_history=True,
                 send_messages=False,
@@ -35,18 +41,18 @@ class SetupCog(commands.Cog):
                 create_private_threads=False,
                 use_application_commands=False,
             ),
-            bot=discord.PermissionOverwrite(
+            bot_member,
+            discord.PermissionOverwrite(
                 view_channel=True,
                 send_messages=True,
                 manage_messages=True,
                 read_message_history=True,
                 use_application_commands=True,
             ),
-            bot_member=bot_member,
         )
         start_action = self._overwrites(
-            everyone_role=everyone,
-            everyone_overwrite=discord.PermissionOverwrite(
+            everyone,
+            discord.PermissionOverwrite(
                 view_channel=True,
                 read_message_history=True,
                 send_messages=False,
@@ -55,60 +61,54 @@ class SetupCog(commands.Cog):
                 create_private_threads=False,
                 use_application_commands=True,
             ),
-            bot=discord.PermissionOverwrite(
+            bot_member,
+            discord.PermissionOverwrite(
                 view_channel=True,
                 send_messages=True,
                 manage_messages=True,
                 read_message_history=True,
                 use_application_commands=True,
             ),
+        )
+        category_locked = self._role_overwrites(
+            everyone=everyone,
+            role=apprentice_role,
+            member_overwrite=discord.PermissionOverwrite(view_channel=True, read_message_history=True),
             bot_member=bot_member,
         )
-        onboarded_read = self._overwrites(
-            everyone_role=everyone,
-            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
-            novato=discord.PermissionOverwrite(
+        read_only = self._role_overwrites(
+            everyone=everyone,
+            role=apprentice_role,
+            member_overwrite=discord.PermissionOverwrite(
                 view_channel=True,
                 read_message_history=True,
                 send_messages=False,
                 add_reactions=False,
                 create_public_threads=False,
                 create_private_threads=False,
+                use_application_commands=True,
             ),
-            bot=discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True,
-                read_message_history=True,
-            ),
-            novato_role=novato_role,
             bot_member=bot_member,
         )
-        guild_chat = self._overwrites(
-            everyone_role=everyone,
-            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
-            novato=discord.PermissionOverwrite(
+        community_write = self._role_overwrites(
+            everyone=everyone,
+            role=apprentice_role,
+            member_overwrite=discord.PermissionOverwrite(
                 view_channel=True,
                 read_message_history=True,
                 send_messages=True,
                 add_reactions=True,
-                attach_files=False,
+                attach_files=True,
                 create_public_threads=False,
                 create_private_threads=False,
+                use_application_commands=True,
             ),
-            bot=discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True,
-                read_message_history=True,
-            ),
-            novato_role=novato_role,
             bot_member=bot_member,
         )
-        deliveries_write = self._overwrites(
-            everyone_role=everyone,
-            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
-            novato=discord.PermissionOverwrite(
+        deliveries_write = self._role_overwrites(
+            everyone=everyone,
+            role=apprentice_role,
+            member_overwrite=discord.PermissionOverwrite(
                 view_channel=True,
                 read_message_history=True,
                 send_messages=True,
@@ -116,33 +116,25 @@ class SetupCog(commands.Cog):
                 attach_files=True,
                 create_public_threads=False,
                 create_private_threads=False,
+                use_application_commands=True,
             ),
-            bot=discord.PermissionOverwrite(
-                view_channel=True,
-                send_messages=True,
-                manage_messages=True,
-                read_message_history=True,
-            ),
-            novato_role=novato_role,
             bot_member=bot_member,
         )
 
-        start_category = await self._get_or_create_category(guild, "🎮 START", overwrites=start_read_only)
+        start_category = await self._get_or_create_category(guild, "🏰 START", overwrites=start_read_only, position=0)
         game_category = await self._get_or_create_category(
             guild,
-            "🐍 PYTHON.GAME",
-            overwrites={
-                everyone: discord.PermissionOverwrite(view_channel=False),
-                novato_role: discord.PermissionOverwrite(view_channel=True),
-            },
+            "🌎 PYTHON.GAME",
+            overwrites=category_locked,
+            aliases=("🐍 PYTHON.GAME",),
+            position=1,
         )
-        study_category = await self._get_or_create_category(
+        community_category = await self._get_or_create_category(
             guild,
-            "🎧 SALAS DE ESTUDO",
-            overwrites={
-                everyone: discord.PermissionOverwrite(view_channel=False),
-                novato_role: discord.PermissionOverwrite(view_channel=True),
-            },
+            "🏕️ COMUNIDADE",
+            overwrites=category_locked,
+            aliases=("🎧 SALAS DE ESTUDO",),
+            position=2,
         )
 
         welcome = await self._get_or_create_text(
@@ -156,9 +148,9 @@ class SetupCog(commands.Cog):
         how_it_works = await self._get_or_create_text(
             guild,
             start_category,
-            "02-🧭-como-funciona",
+            "02-🎯-como-funciona",
             start_read_only,
-            aliases=("🧭-como-funciona", "como-funciona"),
+            aliases=("02-🧭-como-funciona", "🧭-como-funciona", "🎯-como-funciona", "como-funciona"),
             position=1,
         )
         start = await self._get_or_create_text(
@@ -169,34 +161,100 @@ class SetupCog(commands.Cog):
             aliases=("✅-iniciar-jornada", "iniciar-jornada"),
             position=2,
         )
-        chat = await self._get_or_create_text(guild, game_category, "💬-chat-da-guilda", guild_chat)
-        trail = await self._get_or_create_text(guild, game_category, "🐍-trilha-python", onboarded_read)
-        deliveries = await self._get_or_create_text(guild, game_category, "📦-entregas", deliveries_write)
-        ranking = await self._get_or_create_text(guild, game_category, "🏆-ranking", onboarded_read)
-        achievements = await self._get_or_create_text(guild, game_category, "📜-conquistas", onboarded_read)
 
-        silent = await self._get_or_create_voice(
+        journey_map = await self._get_or_create_text(
             guild,
-            study_category,
-            "🔇 quarto-silencioso",
-            overwrites={
-                everyone: discord.PermissionOverwrite(view_channel=False),
-                novato_role: discord.PermissionOverwrite(view_channel=True, connect=True, speak=False),
-            },
+            game_category,
+            "🗺️-mapa-da-jornada",
+            read_only,
+            aliases=("mapa-da-jornada", "🗺️-mapa"),
+            position=0,
+        )
+        trail = await self._get_or_create_text(
+            guild,
+            game_category,
+            "🧩-trilha-python",
+            read_only,
+            aliases=("🐍-trilha-python", "trilha-python"),
+            position=1,
+        )
+        deliveries = await self._get_or_create_text(
+            guild,
+            game_category,
+            "📦-entregas",
+            deliveries_write,
+            aliases=("entregas",),
+            position=2,
+        )
+        ranking = await self._get_or_create_text(
+            guild,
+            game_category,
+            "🏆-ranking",
+            read_only,
+            aliases=("ranking",),
+            position=3,
+        )
+        achievements = await self._get_or_create_text(
+            guild,
+            game_category,
+            "📜-conquistas",
+            read_only,
+            aliases=("conquistas",),
+            position=4,
+        )
+
+        chat = await self._get_or_create_text(
+            guild,
+            community_category,
+            "💬-chat-da-guilda",
+            community_write,
+            aliases=("chat-da-guilda",),
+            position=0,
+        )
+        focus = await self._get_or_create_voice(
+            guild,
+            community_category,
+            "🕯️ sala-de-foco",
+            overwrites=self._voice_overwrites(everyone, apprentice_role, can_speak=False, bot_member=bot_member),
+            aliases=("🔇 quarto-silencioso", "quarto-silencioso", "sala-de-foco"),
+            position=1,
         )
         cafe = await self._get_or_create_voice(
             guild,
-            study_category,
+            community_category,
             "☕ area-do-cafe",
-            overwrites={
-                everyone: discord.PermissionOverwrite(view_channel=False),
-                novato_role: discord.PermissionOverwrite(view_channel=True, connect=True, speak=True),
-            },
+            overwrites=self._voice_overwrites(everyone, apprentice_role, can_speak=True, bot_member=bot_member),
+            aliases=("area-do-cafe",),
+            position=2,
         )
 
-        await self._replace_setup_embed(welcome, self._welcome_embed(how_it_works))
-        await self._replace_setup_embed(how_it_works, self._how_it_works_embed(start))
-        await self._replace_setup_embed(start, self._start_embed())
+        first_content = self.contents.get_content(self.contents.first_content_id())
+
+        await self._replace_setup_embed(
+            welcome,
+            self._welcome_embed(how_it_works),
+            view=PortalView(label="Continuar", emoji="🧭", url=how_it_works.jump_url),
+        )
+        await self._replace_setup_embed(
+            how_it_works,
+            self._how_it_works_embed(start),
+            view=PortalView(label="Iniciar Jornada", emoji="🚀", url=start.jump_url),
+        )
+        await self._replace_setup_embed(
+            start,
+            self._start_embed(),
+            view=StartJourneyView(self.contents, self.database),
+        )
+        await self._replace_setup_embed(journey_map, self._journey_map_embed())
+        await self._replace_setup_embed(
+            trail,
+            self._mission_feed_embed(first_content),
+            view=MissionFeedView(self.database),
+        )
+        await self._replace_setup_embed(deliveries, self._deliveries_embed(), pin=True)
+        await self._replace_setup_embed(ranking, self._ranking_embed())
+        await self._replace_setup_embed(achievements, self._achievements_embed())
+        await self._replace_setup_embed(chat, self._tavern_embed(), pin=True)
 
         self.database.save_guild_setup(
             guild.id,
@@ -210,11 +268,11 @@ class SetupCog(commands.Cog):
 
         await interaction.followup.send(
             (
-                "A fortaleza esta pronta.\n\n"
-                f"Canais criados: {welcome.mention}, {how_it_works.mention}, {start.mention}, "
-                f"{chat.mention}, {trail.mention}, {deliveries.mention}, {ranking.mention}, {achievements.mention}\n"
-                f"Salas de estudo: {silent.name}, {cafe.name}\n\n"
-                "Agora chame a Guilda com `/iniciar`."
+                "A jornada guiada está pronta.\n\n"
+                f"Entrada: {welcome.mention} → {how_it_works.mention} → {start.mention}\n"
+                f"Mapa e missões: {journey_map.mention}, {trail.mention}, {deliveries.mention}\n"
+                f"Comunidade: {chat.mention}, {focus.name}, {cafe.name}\n\n"
+                "Quem chega vê apenas o START. Ao clicar em **Tornar-se Aprendiz**, recebe o cargo e libera o resto da Guilda."
             ),
             ephemeral=True,
         )
@@ -224,15 +282,19 @@ class SetupCog(commands.Cog):
         guild: discord.Guild,
         name: str,
         overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] | None = None,
+        aliases: tuple[str, ...] = (),
+        position: int | None = None,
     ) -> discord.CategoryChannel:
-        existing = discord.utils.get(guild.categories, name=name)
+        existing = self._find_category(guild, (name, *aliases))
         if existing:
+            edit_options: dict[str, object] = {"name": name}
             if overwrites:
-                await existing.edit(overwrites=dict(overwrites))
+                edit_options["overwrites"] = dict(overwrites)
+            if position is not None:
+                edit_options["position"] = position
+            await existing.edit(**edit_options)
             return existing
-        if overwrites:
-            return await guild.create_category(name=name, overwrites=dict(overwrites))
-        return await guild.create_category(name=name)
+        return await guild.create_category(name=name, overwrites=dict(overwrites or {}), position=position)
 
     async def _get_or_create_text(
         self,
@@ -252,9 +314,12 @@ class SetupCog(commands.Cog):
                 edit_options["position"] = position
             await existing.edit(**edit_options)
             return existing
-        if overwrites:
-            return await guild.create_text_channel(name=name, category=category, overwrites=dict(overwrites), position=position)
-        return await guild.create_text_channel(name=name, category=category, position=position)
+        return await guild.create_text_channel(
+            name=name,
+            category=category,
+            overwrites=dict(overwrites or {}),
+            position=position,
+        )
 
     async def _get_or_create_voice(
         self,
@@ -262,35 +327,222 @@ class SetupCog(commands.Cog):
         category: discord.CategoryChannel,
         name: str,
         overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] | None = None,
+        aliases: tuple[str, ...] = (),
+        position: int | None = None,
     ) -> discord.VoiceChannel:
-        existing = discord.utils.get(guild.voice_channels, name=name)
+        existing = self._find_voice_channel(guild, (name, *aliases))
         if existing:
+            edit_options: dict[str, object] = {"name": name, "category": category}
             if overwrites:
-                await existing.edit(overwrites=dict(overwrites))
+                edit_options["overwrites"] = dict(overwrites)
+            if position is not None:
+                edit_options["position"] = position
+            await existing.edit(**edit_options)
             return existing
-        if overwrites:
-            return await guild.create_voice_channel(name=name, category=category, overwrites=dict(overwrites))
-        return await guild.create_voice_channel(name=name, category=category)
+        return await guild.create_voice_channel(
+            name=name,
+            category=category,
+            overwrites=dict(overwrites or {}),
+            position=position,
+        )
 
-    async def _replace_setup_embed(self, channel: discord.TextChannel, embed: discord.Embed) -> None:
-        marker = "python.game.gg • setup"
+    async def _replace_setup_embed(
+        self,
+        channel: discord.TextChannel,
+        embed: discord.Embed,
+        *,
+        view: discord.ui.View | None = None,
+        pin: bool = False,
+    ) -> discord.Message:
         permissions = channel.permissions_for(channel.guild.me) if channel.guild.me else None
         if permissions and permissions.manage_messages:
             try:
                 await channel.purge(
-                    limit=20,
+                    limit=30,
                     check=lambda message: (
                         message.author == channel.guild.me
                         and bool(message.embeds)
-                        and message.embeds[0].footer.text == marker
+                        and message.embeds[0].footer.text == SETUP_MARKER
                     ),
                 )
             except discord.HTTPException:
                 pass
-        embed.set_footer(text=marker)
-        await channel.send(embed=embed)
+
+        embed.set_footer(text=SETUP_MARKER)
+        message = await channel.send(embed=embed, view=view)
+        if pin and permissions and permissions.manage_messages:
+            try:
+                await message.pin(reason="python.game setup")
+            except discord.HTTPException:
+                pass
+        return message
 
     @staticmethod
+    def _welcome_embed(next_channel: discord.TextChannel) -> discord.Embed:
+        embed = discord.Embed(
+            title="🏰 ▣ Bem-vindo à Python.Game",
+            description=(
+                "Você acaba de entrar em uma Guilda onde cada desafio gera experiência, "
+                "cada projeto fortalece suas habilidades e cada conquista marca sua evolução.\n\n"
+                "**Sua jornada começa agora.**\n\n"
+                f"⬇️ Clique em **Continuar** para seguir até {next_channel.mention}."
+            ),
+            color=0x44D07B,
+        )
+        return embed
+
+    @staticmethod
+    def _how_it_works_embed(next_channel: discord.TextChannel) -> discord.Embed:
+        embed = discord.Embed(
+            title="🎯 ▣ Como funciona",
+            description=(
+                "Sua jornada é simples:\n\n"
+                "⚔️ Complete missões\n"
+                "📈 Ganhe XP\n"
+                "🏆 Desbloqueie conquistas\n"
+                "📂 Construa projetos\n"
+                "🚀 Evolua seu portfólio\n\n"
+                "Tudo o que você aprender será usado em desafios reais.\n\n"
+                "**Nenhum exercício existe apenas para preencher tempo.**"
+            ),
+            color=0x4EA5FF,
+        )
+        embed.add_field(name="Próximo passo", value=f"Clique em **Iniciar Jornada** para chegar em {next_channel.mention}.", inline=False)
+        return embed
+
+    @staticmethod
+    def _start_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="✅ ▣ Sua primeira missão",
+            description=(
+                "Clique abaixo para iniciar sua jornada.\n\n"
+                "Ao iniciar você receberá:\n\n"
+                "🎒 Cargo de Aprendiz\n"
+                "📜 Acesso à Trilha Python\n"
+                "⭐ XP inicial"
+            ),
+            color=0xF2C94C,
+        )
+        embed.add_field(name="Portal", value="⚔️ **Tornar-se Aprendiz**", inline=False)
+        return embed
+
+    @staticmethod
+    def _journey_map_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="🗺️ ▣ Mapa da Jornada",
+            description=(
+                "```text\n"
+                "🏰 Início\n"
+                "   ↓\n"
+                "🌱 Fundamentos\n"
+                "   ↓\n"
+                "⚔️ Condicionais\n"
+                "   ↓\n"
+                "🔄 Loops\n"
+                "   ↓\n"
+                "🧙 Funções\n"
+                "   ↓\n"
+                "📂 Arquivos\n"
+                "   ↓\n"
+                "🏛️ Orientação a Objetos\n"
+                "   ↓\n"
+                "🌐 APIs\n"
+                "   ↓\n"
+                "📊 Dados\n"
+                "   ↓\n"
+                "👑 Engenheiro de Dados\n"
+                "```"
+            ),
+            color=0xA779FF,
+        )
+        embed.add_field(name="Como ler o mapa", value="Você avança por entregas aprovadas, não por tempo assistido.", inline=False)
+        return embed
+
+    @staticmethod
+    def _mission_feed_embed(content: TrailContent) -> discord.Embed:
+        mission_number = max(1, content.order + 1)
+        embed = discord.Embed(
+            title=f"📜 MISSÃO {mission_number:02d}",
+            description=(
+                f"**Nome:**\n{content.title}\n\n"
+                f"**Objetivo:**\n{content.objective}\n\n"
+                f"**Recompensa:**\n+{content.raw.get('xp_sugerido', 100)} XP"
+            ),
+            color=0x4EA5FF,
+        )
+        embed.add_field(name="Selo da missão", value=f"`{content.id}`", inline=True)
+        embed.add_field(name="Entrega", value="Use o botão quando estiver pronto para ver o modelo.", inline=False)
+        return embed
+
+    @staticmethod
+    def _deliveries_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="📦 ▣ Entregas",
+            description=(
+                "Envie suas missões neste formato:\n\n"
+                "```text\n"
+                "Missão:\n"
+                "Github:\n"
+                "Observações:\n"
+                "```\n"
+                "Para correção técnica, XP e progressão automática, use o comando `/entregar`."
+            ),
+            color=0xF2C94C,
+        )
+        return embed
+
+    @staticmethod
+    def _ranking_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="🏆 ▣ Ranking da Guilda",
+            description=(
+                "O placar será atualizado pelo bot conforme os Aprendizes concluem missões.\n\n"
+                "🥇 Aguardando o primeiro nome\n"
+                "🥈 Aguardando o próximo avanço\n"
+                "🥉 Aguardando uma nova conquista"
+            ),
+            color=0xF2C94C,
+        )
+        return embed
+
+    @staticmethod
+    def _achievements_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="📜 ▣ Conquistas da Guilda",
+            description=(
+                "Quando alguém desbloquear uma conquista, o anúncio aparece aqui.\n\n"
+                "🏆 Conquista Desbloqueada\n"
+                "Usuário: @Aprendiz\n"
+                "Conquista: Primeira Função\n"
+                "Descrição: criou sua primeira função Python."
+            ),
+            color=0xA779FF,
+        )
+        return embed
+
+    @staticmethod
+    def _tavern_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="🍺 ▣ Taverna da Guilda",
+            description=(
+                "Converse.\n"
+                "Compartilhe progresso.\n"
+                "Conheça outros aventureiros.\n"
+                "Faça networking.\n\n"
+                "**Nada de dúvidas técnicas aqui.**"
+            ),
+            color=0x44D07B,
+        )
+        return embed
+
+    @staticmethod
+    def _find_category(guild: discord.Guild, names: tuple[str, ...]) -> discord.CategoryChannel | None:
+        for name in names:
+            channel = discord.utils.get(guild.categories, name=name)
+            if channel:
+                return channel
+        return None
+
     @staticmethod
     def _find_text_channel(guild: discord.Guild, names: tuple[str, ...]) -> discord.TextChannel | None:
         for name in names:
@@ -300,75 +552,61 @@ class SetupCog(commands.Cog):
         return None
 
     @staticmethod
-    def _welcome_embed(next_channel: discord.TextChannel) -> discord.Embed:
-        embed = discord.Embed(
-            title="🎮 ▣ O portão da Guilda se abriu",
-            description=(
-                "Bem-vindo ao **python.game**.\n\n"
-                "Este servidor é o seu **mapa de campanha**: missões de Python, entregas reais, "
-                "XP, ranks, projetos de portfólio e uma comunidade avançando junto.\n\n"
-                "Aqui ninguém evolui sozinho. A Guilda pergunta, responde, revisa, celebra progresso "
-                "e transforma prática em aventura, um desafio por vez."
-            ),
-            color=0x44D07B,
-        )
-        embed.add_field(name="🟩 Comece pequeno", value="Um exercício. Uma entrega. Um avanço.", inline=True)
-        embed.add_field(name="🕹️ Evolua em público", value="Mostre progresso, peça ajuda e ajude outros membros.", inline=True)
-        embed.add_field(name="💾 Construa algo real", value="Cada projeto vira parte da sua história profissional.", inline=False)
-        embed.add_field(name="➡️ Próximo portal", value=f"Siga para {next_channel.mention}. O chat deste canal fica fechado para manter o ritual limpo.", inline=False)
-        return embed
-
-    @staticmethod
-    def _how_it_works_embed(next_channel: discord.TextChannel) -> discord.Embed:
-        embed = discord.Embed(
-            title="🗺️ ▣ Como a campanha funciona",
-            description=(
-                "**1.** Use `/iniciar` para gravar seu nome no Registro da Guilda.\n"
-                "**2.** Receba uma missão e leia o objetivo de campo.\n"
-                "**3.** Escreva código, teste, erre, ajuste e aprenda.\n"
-                "**4.** Entregue sua solução para receber feedback.\n"
-                "**5.** Ganhe XP, suba de rank e fortaleça seu portfólio.\n\n"
-                "O ritmo da Guilda é simples: **aparecer, praticar, entregar, ajudar e voltar mais forte**."
-            ),
-            color=0x4EA5FF,
-        )
-        embed.add_field(name="🟦 Progressão", value="XP, ranks, missões e conquistas visíveis.", inline=True)
-        embed.add_field(name="📜 Feedback", value="A entrega só conta quando chega no formato certo.", inline=True)
-        embed.add_field(name="☕ Comunidade", value="Use o café para conversar e o quarto silencioso para foco.", inline=False)
-        embed.add_field(name="➡️ Próximo portal", value=f"Quando entender o fluxo, avance para {next_channel.mention}.", inline=False)
-        return embed
-
-    @staticmethod
-    def _start_embed() -> discord.Embed:
-        embed = discord.Embed(
-            title="✅ ▣ Acenda sua primeira missão",
-            description=(
-                "Se você está pronto para entrar na campanha, use:\n\n"
-                "`/iniciar nome:<seu_nome_de_aventureiro>`\n\n"
-                "A partir daí, o bot abre seu mapa, registra seu progresso e libera o primeiro capítulo."
-            ),
-            color=0xF2C94C,
-        )
-        embed.add_field(name="🟨 Primeiro cargo", value="🥚 Novato", inline=True)
-        embed.add_field(name="🧭 Primeiro passo", value="Abrir o mapa da jornada", inline=True)
-        embed.add_field(name="⚔️ Depois disso", value="Leia sua missão ativa, entregue código e comece a ganhar XP.", inline=False)
-        return embed
+    def _find_voice_channel(guild: discord.Guild, names: tuple[str, ...]) -> discord.VoiceChannel | None:
+        for name in names:
+            channel = discord.utils.get(guild.voice_channels, name=name)
+            if channel:
+                return channel
+        return None
 
     @staticmethod
     def _overwrites(
-        *,
         everyone_role: discord.Role,
         everyone_overwrite: discord.PermissionOverwrite,
         bot_member: discord.Member | None,
-        novato_role: discord.Role | None = None,
-        novato: discord.PermissionOverwrite | None = None,
-        bot: discord.PermissionOverwrite | None = None,
+        bot_overwrite: discord.PermissionOverwrite | None,
+    ) -> dict[discord.abc.Snowflake, discord.PermissionOverwrite]:
+        overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] = {everyone_role: everyone_overwrite}
+        if bot_member and bot_overwrite:
+            overwrites[bot_member] = bot_overwrite
+        return overwrites
+
+    @staticmethod
+    def _role_overwrites(
+        *,
+        everyone: discord.Role,
+        role: discord.Role,
+        member_overwrite: discord.PermissionOverwrite,
+        bot_member: discord.Member | None,
     ) -> dict[discord.abc.Snowflake, discord.PermissionOverwrite]:
         overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] = {
-            everyone_role: everyone_overwrite
+            everyone: discord.PermissionOverwrite(view_channel=False),
+            role: member_overwrite,
         }
-        if novato_role and novato:
-            overwrites[novato_role] = novato
-        if bot_member and bot:
-            overwrites[bot_member] = bot
+        if bot_member:
+            overwrites[bot_member] = discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+                use_application_commands=True,
+                connect=True,
+                speak=True,
+            )
+        return overwrites
+
+    @staticmethod
+    def _voice_overwrites(
+        everyone: discord.Role,
+        role: discord.Role,
+        *,
+        can_speak: bool,
+        bot_member: discord.Member | None,
+    ) -> dict[discord.abc.Snowflake, discord.PermissionOverwrite]:
+        overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] = {
+            everyone: discord.PermissionOverwrite(view_channel=False),
+            role: discord.PermissionOverwrite(view_channel=True, connect=True, speak=can_speak),
+        }
+        if bot_member:
+            overwrites[bot_member] = discord.PermissionOverwrite(view_channel=True, connect=True, speak=True)
         return overwrites

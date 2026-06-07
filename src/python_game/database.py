@@ -406,6 +406,30 @@ class GameDatabase:
                 ),
             )
 
+    def guild_settings(self, guild_id: int) -> dict[str, int | None]:
+        with self.connect() as connection:
+            row = connection.execute(
+                """
+                SELECT announcements_channel_id, trail_channel_id, deliveries_channel_id, ranking_channel_id
+                FROM guild_settings
+                WHERE guild_id = ?
+                """,
+                (guild_id,),
+            ).fetchone()
+        if row is None:
+            return {
+                "announcements": None,
+                "trail": None,
+                "deliveries": None,
+                "ranking": None,
+            }
+        return {
+            "announcements": row["announcements_channel_id"],
+            "trail": row["trail_channel_id"],
+            "deliveries": row["deliveries_channel_id"],
+            "ranking": row["ranking_channel_id"],
+        }
+
     def add_moderation_event(
         self,
         *,
