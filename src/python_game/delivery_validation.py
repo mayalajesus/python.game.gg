@@ -27,7 +27,7 @@ def validate_delivery_format(text: str) -> DeliveryValidationResult:
         return DeliveryValidationResult(
             is_valid=False,
             message=(
-                "Entrega fora do formato. Reenvie usando `/entregar desafio_id: ...`, "
+                "O selo da entrega ainda nao abriu. Reenvie usando `/entregar desafio_id: ...`, "
                 "um bloco `Codigo:` com ```python e uma `Explicacao:`."
             ),
         )
@@ -36,11 +36,11 @@ def validate_delivery_format(text: str) -> DeliveryValidationResult:
     explanation = match.group("explanation").strip()
 
     if not code:
-        return DeliveryValidationResult(is_valid=False, message="O bloco de codigo esta vazio.")
+        return DeliveryValidationResult(is_valid=False, message="O pergaminho de codigo veio vazio.")
     if len(explanation) < 10:
         return DeliveryValidationResult(
             is_valid=False,
-            message="A explicacao esta curta demais. Explique brevemente como a solucao funciona.",
+            message="A explicacao esta curta demais. Conte rapidamente como sua solucao funciona.",
         )
 
     return DeliveryValidationResult(
@@ -48,6 +48,5 @@ def validate_delivery_format(text: str) -> DeliveryValidationResult:
         challenge_id=match.group("challenge_id").strip(),
         code=code,
         explanation=explanation,
-        message="Formato validado. A entrega pode seguir para correcao.",
+        message="Selo validado. A entrega pode seguir para avaliacao.",
     )
-

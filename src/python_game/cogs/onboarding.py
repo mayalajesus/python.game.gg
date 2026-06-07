@@ -44,7 +44,11 @@ class OnboardingCog(commands.Cog):
 
         content = self.contents.get_content(player.active_content_id or first_content_id)
         await interaction.response.send_message(
-            f"🥚 **{player.hero_name} entrou na Guilda.** Seu mapa foi aberto e a primeira missao esta ativa.",
+            (
+                f"🥚 **{player.hero_name}, seu nome foi gravado no Registro da Guilda.**\n\n"
+                "A primeira marca do seu mapa acendeu. A partir daqui, cada entrega conta: "
+                "pergunte, ajude, mostre progresso e avance com a comunidade."
+            ),
             embed=mission_embed(content, has_recommendation_links(content)),
             ephemeral=True,
         )
@@ -53,7 +57,8 @@ class OnboardingCog(commands.Cog):
     async def formato(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             (
-                "Envie suas entregas neste modelo:\n\n"
+                "📜 **Formato oficial de entrega**\n\n"
+                "O avaliador da Guilda so abre a correcao quando a missao chega neste formato:\n\n"
                 "````text\n"
                 "/entregar desafio_id: fundamentos_01\n\n"
                 "Codigo:\n"
@@ -62,7 +67,8 @@ class OnboardingCog(commands.Cog):
                 "```\n\n"
                 "Explicacao:\n"
                 "Explique em poucas linhas como sua solucao funciona.\n"
-                "````"
+                "````\n\n"
+                "Clareza tambem faz parte da missao."
             ),
             ephemeral=True,
         )
@@ -73,7 +79,10 @@ class OnboardingCog(commands.Cog):
         member = require_member(interaction)
         player = self.database.get_player(member.id, guild.id)
         if player is None:
-            await interaction.response.send_message("Use `/iniciar` para abrir seu perfil na Guilda.", ephemeral=True)
+            await interaction.response.send_message(
+                "Seu nome ainda nao apareceu no Registro da Guilda. Use `/iniciar` para abrir sua campanha.",
+                ephemeral=True,
+            )
             return
         stats = self.database.stats(member.id, guild.id)
         await interaction.response.send_message(
@@ -85,15 +94,15 @@ class OnboardingCog(commands.Cog):
     async def guia(self, interaction: discord.Interaction) -> None:
         await interaction.response.send_message(
             (
-                "🎮 **Comandos da Guilda**\n\n"
-                "`/setup_servidor` cria os canais e cargos iniciais.\n"
-                "`/iniciar` registra seu personagem.\n"
-                "`/missao` mostra ou troca a missao ativa.\n"
-                "`/conteudo` mostra links cadastrados, se existirem.\n"
-                "`/entregar` envia codigo para avaliacao.\n"
-                "`/perfil` mostra XP, rank e progresso.\n"
-                "`/ranking` mostra o placar da Guilda.\n"
-                "`/registrar_projeto` adiciona projeto ao portfolio.\n"
+                "🎮 **Painel da Guilda**\n\n"
+                "`/setup_servidor` ergue a estrutura da campanha.\n"
+                "`/iniciar` grava seu nome no Registro da Guilda.\n"
+                "`/missao` mostra ou troca o capitulo ativo.\n"
+                "`/conteudo` abre a biblioteca da missao.\n"
+                "`/entregar` envia sua solucao para avaliacao.\n"
+                "`/perfil` mostra sua cronica: XP, rank e progresso.\n"
+                "`/ranking` revela o placar da Guilda.\n"
+                "`/registrar_projeto` coloca uma entrega na sua vitrine.\n"
             ),
             ephemeral=True,
         )

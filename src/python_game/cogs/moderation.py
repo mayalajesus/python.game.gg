@@ -49,12 +49,12 @@ class ModerationCog(commands.Cog):
         events = self.database.moderation_events_for_user(guild.id, membro.id)
         if not events:
             await interaction.response.send_message(
-                f"Nenhum evento de moderacao registrado para {membro.mention}.",
+                f"O registro disciplinar de {membro.mention} esta limpo.",
                 ephemeral=True,
             )
             return
 
-        lines = [f"🛡️ **Historico de moderacao: {membro.display_name}**"]
+        lines = [f"🛡️ **Registro disciplinar: {membro.display_name}**"]
         for event in events:
             lines.append(f"- `{event['created_at']}` {event['action']}: {event['reason']}")
         await interaction.response.send_message("\n".join(lines), ephemeral=True)
@@ -67,7 +67,7 @@ class ModerationCog(commands.Cog):
             return
         await interaction.response.defer(ephemeral=True, thinking=True)
         deleted = await interaction.channel.purge(limit=quantidade)
-        await interaction.followup.send(f"Mensagens removidas: {len(deleted)}", ephemeral=True)
+        await interaction.followup.send(f"O canal foi varrido. Mensagens removidas: {len(deleted)}", ephemeral=True)
 
     def _inspect_message(self, message: discord.Message) -> ModerationDecision | None:
         content = message.content.strip()
@@ -137,9 +137,10 @@ class ModerationCog(commands.Cog):
 
         try:
             await member.send(
-                "🛡️ Aviso da Guilda python.game\n\n"
+                "🛡️ **Aviso da Guarda da Guilda**\n\n"
                 f"Sua mensagem foi sinalizada por: {decision.reason}\n"
-                "Mantenha o ritmo da jornada sem flood, repeticao excessiva ou mencoes em massa."
+                "Mantenha a campanha fluindo: sem flood, repeticao excessiva ou mencoes em massa. "
+                "A comunidade cresce melhor quando o canal continua legivel para todos."
             )
         except discord.HTTPException:
             pass
@@ -158,4 +159,3 @@ class ModerationCog(commands.Cog):
             return False
         link_messages = [entry for entry in window if re.search(r"https?://", entry[1], re.IGNORECASE)]
         return len(link_messages) >= 3
-

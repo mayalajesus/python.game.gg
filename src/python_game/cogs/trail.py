@@ -22,13 +22,13 @@ class TrailCog(commands.Cog):
     @app_commands.command(name="trilha", description="Lista os conteudos cadastrados na trilha.")
     async def trilha(self, interaction: discord.Interaction) -> None:
         contents = self.contents.list_contents()
-        lines = ["🐍 **Mapa da trilha python.game**"]
+        lines = ["🐍 **Mapa da Campanha Python**"]
         for item in contents[:15]:
             lines.append(f"- `{item['id']}` - {item['titulo']}")
         if len(contents) > 15:
-            lines.append(f"...e mais {len(contents) - 15} conteudos.")
+            lines.append(f"...e mais {len(contents) - 15} capitulos aguardando no mapa.")
         lines.append("")
-        lines.append("Use `/missao id:<id>` para ativar uma missao ou `/conteudo id:<id>` para ver materiais.")
+        lines.append("Use `/missao id:<id>` para acender um capitulo no seu mapa.")
         await interaction.response.send_message("\n".join(lines), ephemeral=True)
 
     @app_commands.command(name="conteudo", description="Mostra recomendacoes cadastradas para um conteudo.")
@@ -41,7 +41,7 @@ class TrailCog(commands.Cog):
             content = self.contents.get_content(content_id)
         except KeyError:
             await interaction.response.send_message(
-                f"Conteudo nao encontrado: `{content_id}`.",
+                f"A biblioteca nao encontrou esse selo de missao: `{content_id}`.",
                 ephemeral=True,
             )
             return
@@ -54,19 +54,22 @@ class TrailCog(commands.Cog):
         member = require_member(interaction)
         player = self.database.get_player(member.id, guild.id)
         if player is None:
-            await interaction.response.send_message("Use `/iniciar` antes de abrir missoes.", ephemeral=True)
+            await interaction.response.send_message(
+                "Antes de abrir o mapa, grave seu nome no Registro da Guilda com `/iniciar`.",
+                ephemeral=True,
+            )
             return
 
         content_id = id or player.active_content_id or self.contents.first_content_id()
         try:
             content = self.contents.get_content(content_id)
         except KeyError:
-            await interaction.response.send_message(f"Missao nao encontrada: `{content_id}`.", ephemeral=True)
+            await interaction.response.send_message(f"Nenhum capitulo encontrado com o selo `{content_id}`.", ephemeral=True)
             return
 
         self.database.set_active_content(member.id, guild.id, content.id)
         await interaction.response.send_message(
-            "🗺️ Missao ativa atualizada.",
+            "🗺️ O mapa foi atualizado. Este e o seu capitulo ativo.",
             embed=mission_embed(content, has_recommendation_links(content)),
             ephemeral=True,
         )
@@ -84,13 +87,16 @@ class TrailCog(commands.Cog):
         member = require_member(interaction)
         player = self.database.get_player(member.id, guild.id)
         if player is None:
-            await interaction.response.send_message("Use `/iniciar` antes de entregar missoes.", ephemeral=True)
+            await interaction.response.send_message(
+                "A Guilda ainda nao reconhece seu nome. Use `/iniciar` antes de entregar missoes.",
+                ephemeral=True,
+            )
             return
 
         try:
             content = self.contents.get_content(desafio_id)
         except KeyError:
-            await interaction.response.send_message(f"Missao nao encontrada: `{desafio_id}`.", ephemeral=True)
+            await interaction.response.send_message(f"O selo `{desafio_id}` nao existe no mapa da Guilda.", ephemeral=True)
             return
 
         evaluation = evaluate_submission(content, codigo, explicacao)
@@ -120,7 +126,7 @@ class TrailCog(commands.Cog):
             )
             synced_rank = await sync_member_rank(member, updated.xp)
             if synced_rank != player.rank_role:
-                new_rank_message = f"\n🏅 Novo rank sincronizado: **{synced_rank}**"
+                new_rank_message = f"\n🏅 Novo rank conquistado: **{synced_rank}**"
             next_content_id = self.contents.next_content_id(content.id)
             if next_content_id:
                 self.database.set_active_content(member.id, guild.id, next_content_id)
@@ -132,7 +138,7 @@ class TrailCog(commands.Cog):
             evaluation.strengths,
             evaluation.improvements,
         )
-        reward = f"\nXP recebido: **+{xp_awarded}**" if xp_awarded else "\nXP recebido: **+0**"
+        reward = f"\nRecompensa registrada: **+{xp_awarded} XP**" if xp_awarded else "\nRecompensa registrada: **+0 XP**"
         await interaction.response.send_message(
             evaluation.feedback + reward + new_rank_message,
             embed=embed,
@@ -150,9 +156,12 @@ class TrailCog(commands.Cog):
         guild = require_guild(interaction)
         players = self.database.leaderboard(guild.id)
         if not players:
-            await interaction.response.send_message("Ainda nao ha aventureiros no ranking. Use `/iniciar`.", ephemeral=True)
+            await interaction.response.send_message(
+                "O placar da Guilda ainda esta em branco. Use `/iniciar` para escrever o primeiro nome.",
+                ephemeral=True,
+            )
             return
-        lines = ["🏆 **Ranking da Guilda**"]
+        lines = ["🏆 **Placar da Guilda**"]
         for index, player in enumerate(players, start=1):
             lines.append(f"{index}. **{player.hero_name}** - {player.xp} XP - {player.rank_role}")
         await interaction.response.send_message("\n".join(lines), ephemeral=False)
@@ -170,7 +179,10 @@ class TrailCog(commands.Cog):
         member = require_member(interaction)
         player = self.database.get_player(member.id, guild.id)
         if player is None:
-            await interaction.response.send_message("Use `/iniciar` antes de registrar projetos.", ephemeral=True)
+            await interaction.response.send_message(
+                "Antes de montar sua vitrine, entre na campanha com `/iniciar`.",
+                ephemeral=True,
+            )
             return
         content_id = desafio_id or player.active_content_id or self.contents.first_content_id()
         self.database.add_project(
@@ -191,7 +203,7 @@ class TrailCog(commands.Cog):
         )
         await sync_member_rank(member, updated.xp)
         await interaction.response.send_message(
-            f"📦 Projeto registrado no portfolio: **{titulo}**\nXP recebido: **+50**",
+            f"📦 **{titulo}** entrou na sua vitrine da Guilda.\nRecompensa registrada: **+50 XP**",
             ephemeral=True,
         )
 
@@ -201,9 +213,12 @@ class TrailCog(commands.Cog):
         member = require_member(interaction)
         projects = self.database.portfolio(member.id, guild.id)
         if not projects:
-            await interaction.response.send_message("Seu portfolio interno ainda esta vazio.", ephemeral=True)
+            await interaction.response.send_message(
+                "Sua vitrine ainda esta vazia. Registre um projeto quando sua primeira entrega virar portfolio.",
+                ephemeral=True,
+            )
             return
-        lines = [f"📦 **Portfolio de {member.display_name}**"]
+        lines = [f"📦 **Vitrine de {member.display_name}**"]
         for project in projects[:10]:
             lines.append(f"- **{project['title']}** (`{project['content_id']}`): {project['repository_url']}")
         await interaction.response.send_message("\n".join(lines), ephemeral=True)
@@ -219,6 +234,6 @@ class TrailCog(commands.Cog):
             await message.reply(f"⚠️ {result.message}", mention_author=False)
             return
         await message.reply(
-            "✅ Formato validado. Para registrar XP e feedback completo, use o comando slash `/entregar`.",
+            "✅ O selo de formato esta correto. Para registrar XP e receber feedback completo, use o comando slash `/entregar`.",
             mention_author=False,
         )

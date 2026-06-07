@@ -152,19 +152,25 @@ class SetupCog(commands.Cog):
         )
 
         await welcome.send(
-            "🎮 **Bem-vindo ao python.game**\n\n"
-            "Voce entrou na Guilda dos Aprendizes. Aqui voce evolui por missoes, XP, ranks e projetos reais."
+            "🎮 **O portao da Guilda se abriu.**\n\n"
+            "Bem-vindo ao **python.game**. Este servidor e o seu mapa de campanha: "
+            "missoes de Python, entregas reais, XP, ranks e projetos que viram portfolio.\n\n"
+            "Aqui ninguem avanca sozinho. A Guilda pergunta, responde, revisa, celebra progresso "
+            "e cresce junto, um desafio por vez."
         )
         await how_it_works.send(
-            "🧭 **Como funciona**\n\n"
-            "1. Use `/iniciar`\n"
-            "2. Receba uma missao\n"
-            "3. Estude pelo objetivo da missao\n"
-            "4. Entregue seu codigo\n"
-            "5. Ganhe XP e desbloqueie ranks\n\n"
-            "A jornada funciona pelo mapa de missoes, entregas e feedback."
+            "🧭 **Como a campanha funciona**\n\n"
+            "1. Use `/iniciar` para assinar o registro da Guilda.\n"
+            "2. Receba uma missao no seu mapa.\n"
+            "3. Escreva codigo, teste, erre, ajuste e aprenda.\n"
+            "4. Entregue sua solucao para receber feedback.\n"
+            "5. Ganhe XP, suba de rank e fortaleça seu portfolio.\n\n"
+            "O ritmo e simples: aparecer, praticar, entregar, ajudar e voltar mais forte."
         )
-        await start.send("✅ Use `/iniciar nome:<seu_nome_de_aventureiro>` para abrir o mapa da Guilda.")
+        await start.send(
+            "✅ **Pronto para entrar na campanha?**\n\n"
+            "Use `/iniciar nome:<seu_nome_de_aventureiro>` e a primeira missao acende no seu mapa."
+        )
 
         self.database.save_guild_setup(
             guild.id,
@@ -178,10 +184,11 @@ class SetupCog(commands.Cog):
 
         await interaction.followup.send(
             (
-                "Setup concluido.\n\n"
+                "A fortaleza esta pronta.\n\n"
                 f"Canais criados: {welcome.mention}, {how_it_works.mention}, {start.mention}, "
                 f"{chat.mention}, {trail.mention}, {deliveries.mention}, {ranking.mention}, {achievements.mention}\n"
-                f"Voz: {silent.name}, {cafe.name}"
+                f"Salas de estudo: {silent.name}, {cafe.name}\n\n"
+                "Agora chame a Guilda com `/iniciar`."
             ),
             ephemeral=True,
         )

@@ -74,8 +74,8 @@ class ContentRepository:
 
 def format_recommendations(content: TrailContent) -> str:
     lines = [
-        f"🎒 Conteudo: {content.title}",
-        f"🎯 Objetivo: {content.objective}",
+        f"📚 Biblioteca da missao: {content.title}",
+        f"🎯 Objetivo de campo: {content.objective}",
         "",
     ]
 

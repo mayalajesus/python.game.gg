@@ -105,9 +105,9 @@ def evaluate_submission(content: TrailContent, code: str, explanation: str) -> E
     accepted = syntax_ok and score >= 70
 
     if accepted:
-        feedback = "Missao aprovada. A Guilda registrou seu progresso."
+        feedback = "Capitulo vencido. A Guilda registrou seu progresso no mapa."
     else:
-        feedback = "Missao ainda nao aprovada. Ajuste os pontos abaixo e reenvie."
+        feedback = "A missao ainda pede ajustes. Refine a solucao e volte para a proxima tentativa."
 
     return Evaluation(
         accepted=accepted,

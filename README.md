@@ -2,9 +2,9 @@
 
 **python.game.gg** e uma plataforma gamificada de aprendizado de Python construida sobre o Discord.
 
-O projeto transforma o estudo de programacao em uma jornada de RPG: alunos recebem missoes, ganham XP, sobem de rank, desbloqueiam progresso, registram entregas e constroem um portfolio real com foco em Python e Engenharia de Dados.
+O projeto transforma o estudo de programacao em uma campanha viva: alunos entram em uma Guilda, recebem missoes, ganham XP, sobem de rank, criam projetos reais e avancam com a comunidade.
 
-O bot e o nucleo operacional da Guilda.
+O bot e o mestre de cerimonia dessa jornada. Ele abre o mapa, registra progresso, organiza entregas, protege os canais e ajuda cada aluno a transformar pratica diaria em portfolio.
 
 ---
 
@@ -40,7 +40,7 @@ Entrou no servidor
   -> registra projetos no portfolio
 ```
 
-A proposta nao e apenas assistir conteudo. A proposta e concluir missoes praticas e sair com entregas reais.
+A proposta nao e apenas assistir conteudo. A proposta e aparecer na Guilda, praticar com consistencia, construir junto e sair com entregas reais.
 
 ---
 
@@ -356,4 +356,3 @@ Validacoes cobertas:
 MVP operacional.
 
 O bot ja esta preparado para criar o servidor, iniciar alunos, liberar missoes, avaliar entregas, registrar XP, gerar ranking, manter portfolio e aplicar moderacao basica.
-
