@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 
 @dataclass(frozen=True)
 class Settings:
-    discord_token: str
+    discord_bot_token: str
     discord_client_id: str
     discord_guild_id: str
     command_prefix: str
@@ -29,7 +29,7 @@ def load_settings() -> Settings:
         content_index_path = project_dir / content_index_path
 
     return Settings(
-        discord_token=os.getenv("DISCORD_BOT_TOKEN") or os.getenv("DISCORD_TOKEN", ""),
+        discord_bot_token=os.getenv("DISCORD_BOT_TOKEN", ""),
         discord_client_id=os.getenv("DISCORD_CLIENT_ID", ""),
         discord_guild_id=os.getenv("DISCORD_GUILD_ID", ""),
         command_prefix=os.getenv("COMMAND_PREFIX", "/"),

@@ -27,6 +27,25 @@ def test_loads_single_content() -> None:
     assert "variaveis" in content.raw["conceitos"]
 
 
+def test_content_files_do_not_expose_extra_manual_fields() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    forbidden_fields = {
+        "bot",
+        "observacoes_internas",
+    }
+    forbidden_nested_fields = {
+        "validacao": {"criterios_manuais"},
+        "status": {"revisado", "links_adicionados"},
+    }
+
+    for item in repository.list_contents():
+        content = repository.get_content(item["id"])
+
+        assert forbidden_fields.isdisjoint(content.raw.keys())
+        for parent, fields in forbidden_nested_fields.items():
+            assert fields.isdisjoint(content.raw.get(parent, {}).keys())
+
+
 def test_validates_expected_delivery_format() -> None:
     result = validate_delivery_format(
         """/entregar desafio_id: fundamentos_01

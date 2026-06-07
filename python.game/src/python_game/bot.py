@@ -46,11 +46,11 @@ class PythonGameBot(commands.Bot):
 
 async def main() -> None:
     bot = PythonGameBot()
-    if not bot.settings.discord_token:
-        raise RuntimeError("DISCORD_TOKEN nao configurado. Preencha a .env antes de iniciar o bot.")
+    if not bot.settings.discord_bot_token:
+        raise RuntimeError("DISCORD_BOT_TOKEN nao configurado. Preencha a .env antes de iniciar o bot.")
 
     async with bot:
-        await bot.start(bot.settings.discord_token)
+        await bot.start(bot.settings.discord_bot_token)
 
 
 if __name__ == "__main__":

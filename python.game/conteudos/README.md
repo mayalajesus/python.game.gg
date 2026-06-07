@@ -4,7 +4,14 @@ Esta pasta guarda os arquivos JSON de cada conteudo da trilha.
 
 A ideia e simples: o cronograma define a jornada, e estes JSONs guardam os links que o bot deve recomendar para cada etapa.
 
-## Como preencher
+No projeto inteiro, a unica edicao manual esperada e:
+
+- preencher a `.env`
+- adicionar links de estudo nos campos `recomendacoes.*`
+
+Todo o restante deve ser mantido pelo proprio projeto.
+
+## Como adicionar links
 
 Abra o JSON do conteudo desejado e adicione links nos campos:
 
@@ -17,6 +24,8 @@ Abra o JSON do conteudo desejado e adicione links nos campos:
 - `recomendacoes.repositorios`
 - `recomendacoes.ferramentas`
 - `recomendacoes.outros`
+
+Nao edite os outros campos do JSON. Eles fazem parte da estrutura da trilha e sao usados pelo bot para liberar missoes, calcular XP e validar entregas.
 
 Exemplo:
 
@@ -58,4 +67,3 @@ Videos recomendados:
 Documentacao:
 - link oficial
 ```
-

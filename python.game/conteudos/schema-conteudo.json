@@ -1,5 +1,5 @@
 ﻿{
-    "descricao":  "Modelo de arquivo JSON para cada conteudo da trilha python.game.",
+    "descricao":  "Modelo de arquivo JSON para cada conteudo da trilha python.game. A unica edicao manual esperada nestes arquivos e adicionar links em recomendacoes.",
     "campos_obrigatorios":  [
                                 "id",
                                 "titulo",
@@ -10,7 +10,6 @@
                                 "objetivo",
                                 "conceitos",
                                 "recomendacoes",
-                                "bot",
                                 "entrega",
                                 "validacao",
                                 "status"
@@ -25,5 +24,31 @@
                           "repositorios":  "Links de repositorios GitHub ou exemplos de codigo.",
                           "ferramentas":  "Links de ferramentas que o aluno deve instalar ou usar.",
                           "outros":  "Qualquer outro recurso util."
-                      }
+                      },
+    "campos_editaveis_manualmente":  [
+                                         "recomendacoes.pdfs",
+                                         "recomendacoes.videos",
+                                         "recomendacoes.artigos",
+                                         "recomendacoes.sites_oficiais",
+                                         "recomendacoes.documentacao",
+                                         "recomendacoes.cursos",
+                                         "recomendacoes.repositorios",
+                                         "recomendacoes.ferramentas",
+                                         "recomendacoes.outros"
+                                     ],
+    "campos_gerenciados_pelo_projeto":  [
+                                            "id",
+                                            "titulo",
+                                            "modulo",
+                                            "semana",
+                                            "ordem",
+                                            "nivel",
+                                            "objetivo",
+                                            "conceitos",
+                                            "projeto_relacionado",
+                                            "xp_sugerido",
+                                            "entrega",
+                                            "validacao",
+                                            "status"
+                                        ]
 }

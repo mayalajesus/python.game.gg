@@ -45,20 +45,6 @@
 
                                      ]
                       },
-    "bot":  {
-                "mensagem_curta":  "",
-                "antes_da_missao":  [
-
-                                    ],
-                "exercicio_aquecimento":  "",
-                "reforco_se_erro":  [
-
-                                    ],
-                "criterio_para_liberar_missao":  [
-                                                     "aluno concluiu onboarding",
-                                                     "aluno visualizou recomendacoes do conteudo"
-                                                 ]
-            },
     "entrega":  {
                     "formato_obrigatorio":  "/entregar desafio_id: docker_cli_orquestracao",
                     "exigir_codigo":  true,
@@ -73,15 +59,9 @@
                       "formato_correto":  true,
                       "testes_automaticos":  [
 
-                                             ],
-                      "criterios_manuais":  [
-
-                                            ]
+                                             ]
                   },
     "status":  {
-                   "ativo":  true,
-                   "revisado":  false,
-                   "links_adicionados":  false
-               },
-    "observacoes_internas":  ""
+                   "ativo":  true
+               }
 }

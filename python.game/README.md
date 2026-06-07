@@ -45,7 +45,7 @@ O bot usa `conteudos/index-conteudos.json` para localizar os arquivos individuai
 
 ## Configuracao
 
-Crie uma `.env` na raiz do workspace ou dentro de `python.game/` com:
+Crie uma `.env` dentro de `python.game/` com:
 
 ```text
 DISCORD_CLIENT_ID=id_do_app
@@ -54,6 +54,13 @@ DISCORD_GUILD_ID=id_do_servidor_de_teste
 COMMAND_PREFIX=/
 CONTENT_INDEX_PATH=conteudos/index-conteudos.json
 ```
+
+No projeto inteiro, as unicas configuracoes manuais sao:
+
+- `.env`, para credenciais e IDs do Discord
+- links de estudo em `conteudos/**.json`, apenas dentro de `recomendacoes.*`
+
+Os demais campos dos JSONs sao parte da trilha e devem permanecer como definidos pelo projeto.
 
 ## Rodando localmente
 

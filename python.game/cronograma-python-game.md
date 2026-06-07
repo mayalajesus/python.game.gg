@@ -22,6 +22,13 @@ Os links recomendados devem ficar em arquivos JSON individuais dentro da pasta `
 
 Cada conteudo da trilha possui um arquivo proprio para que links sejam adicionados manualmente depois, sem precisar alterar o cronograma inteiro ou o codigo do bot.
 
+No projeto inteiro, a unica edicao manual esperada e:
+
+- preencher a `.env`
+- adicionar links de estudo nos campos `recomendacoes.*`
+
+Todos os demais campos dos JSONs fazem parte da trilha e devem ser tratados como configuracao do projeto, nao como conteudo manual.
+
 Arquivos de apoio:
 
 - `conteudos/index-conteudos.json`: indice com todos os conteudos da trilha
@@ -643,7 +650,7 @@ Conteudos:
 - HTML basico
 - BeautifulSoup
 - Cuidados eticos
-- Agendamento manual
+- Agendamento local
 
 Missoes:
 
