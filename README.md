@@ -15,6 +15,8 @@ Ele deve funcionar como o nucleo da plataforma:
 - rankings
 - portfolio interno
 - banco SQLite local dentro do projeto
+- moderacao e anti-spam
+- permissoes refinadas por canal
 
 ## Estrutura
 
@@ -82,6 +84,8 @@ Os demais campos dos JSONs sao parte da trilha e devem permanecer como definidos
 - `/ranking`: mostra o placar de XP.
 - `/registrar_projeto`: adiciona projeto ao portfolio interno.
 - `/portfolio`: lista os projetos registrados.
+- `/mod_status`: mostra historico recente de moderacao de um membro.
+- `/mod_limpar`: remove mensagens recentes de um canal.
 
 Os materiais de estudo sao opcionais. O bot sempre guia o aluno pelo objetivo, criterios da missao, entrega e feedback.
 
@@ -97,8 +101,31 @@ Esse arquivo guarda:
 - progresso por conteudo
 - projetos do portfolio
 - configuracao basica do servidor
+- eventos de moderacao
 
 O banco e criado automaticamente na primeira execucao.
+
+## Moderacao e permissoes
+
+O bot possui uma camada anti-spam conservadora:
+
+- detecta excesso de mensagens em poucos segundos
+- detecta mensagens repetidas
+- detecta mencoes em massa
+- detecta convites externos
+- detecta rajadas de links
+- registra eventos no SQLite
+- remove mensagens quando o bot tiver permissao
+- aplica timeout em reincidencias quando o bot tiver permissao para moderar membros
+
+O `/setup_servidor` tambem aplica permissoes por canal:
+
+- canais de boas-vindas e explicacao ficam em leitura
+- canais da trilha, ranking e conquistas ficam em leitura para alunos e escrita para o bot
+- chat da guilda permite conversa dos alunos onboardados
+- entregas permite envio de codigo e arquivos
+- quarto silencioso permite conectar, mas bloqueia fala
+- area do cafe permite conversa por voz
 
 ## Rodando localmente
 

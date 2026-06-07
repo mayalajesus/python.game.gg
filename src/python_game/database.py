@@ -123,6 +123,17 @@ class GameDatabase:
                     deliveries_channel_id INTEGER,
                     ranking_channel_id INTEGER
                 );
+
+                CREATE TABLE IF NOT EXISTS moderation_events (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    guild_id INTEGER NOT NULL,
+                    discord_id INTEGER NOT NULL,
+                    moderator_id INTEGER,
+                    action TEXT NOT NULL,
+                    reason TEXT NOT NULL,
+                    message_excerpt TEXT,
+                    created_at TEXT NOT NULL
+                );
                 """
             )
 
@@ -394,6 +405,67 @@ class GameDatabase:
                     channels.get("ranking"),
                 ),
             )
+
+    def add_moderation_event(
+        self,
+        *,
+        guild_id: int,
+        discord_id: int,
+        action: str,
+        reason: str,
+        moderator_id: int | None = None,
+        message_excerpt: str | None = None,
+    ) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO moderation_events (
+                    guild_id, discord_id, moderator_id, action, reason, message_excerpt, created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    guild_id,
+                    discord_id,
+                    moderator_id,
+                    action,
+                    reason,
+                    (message_excerpt or "")[:240],
+                    utcnow(),
+                ),
+            )
+
+    def moderation_events_for_user(self, guild_id: int, discord_id: int, limit: int = 10) -> list[sqlite3.Row]:
+        with self.connect() as connection:
+            return connection.execute(
+                """
+                SELECT * FROM moderation_events
+                WHERE guild_id = ? AND discord_id = ?
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (guild_id, discord_id, limit),
+            ).fetchall()
+
+    def moderation_event_count(self, guild_id: int, discord_id: int, action: str | None = None) -> int:
+        with self.connect() as connection:
+            if action:
+                row = connection.execute(
+                    """
+                    SELECT COUNT(*) AS total FROM moderation_events
+                    WHERE guild_id = ? AND discord_id = ? AND action = ?
+                    """,
+                    (guild_id, discord_id, action),
+                ).fetchone()
+            else:
+                row = connection.execute(
+                    """
+                    SELECT COUNT(*) AS total FROM moderation_events
+                    WHERE guild_id = ? AND discord_id = ?
+                    """,
+                    (guild_id, discord_id),
+                ).fetchone()
+        return int(row["total"])
 
     @staticmethod
     def _player_from_row(row: sqlite3.Row) -> Player:

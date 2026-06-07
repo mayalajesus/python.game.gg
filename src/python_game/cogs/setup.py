@@ -22,8 +22,90 @@ class SetupCog(commands.Cog):
         roles = await ensure_rank_roles(guild)
         novato_role = roles["🥚 Novato"]
         everyone = guild.default_role
+        bot_member = guild.me
 
-        start_category = await self._get_or_create_category(guild, "🎮 START")
+        public_read = self._overwrites(
+            everyone_role=everyone,
+            everyone_overwrite=discord.PermissionOverwrite(
+                view_channel=True,
+                read_message_history=True,
+                send_messages=False,
+                add_reactions=False,
+                create_public_threads=False,
+                create_private_threads=False,
+            ),
+            bot=discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+            ),
+            bot_member=bot_member,
+        )
+        onboarded_read = self._overwrites(
+            everyone_role=everyone,
+            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
+            novato=discord.PermissionOverwrite(
+                view_channel=True,
+                read_message_history=True,
+                send_messages=False,
+                add_reactions=False,
+                create_public_threads=False,
+                create_private_threads=False,
+            ),
+            bot=discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+            ),
+            novato_role=novato_role,
+            bot_member=bot_member,
+        )
+        guild_chat = self._overwrites(
+            everyone_role=everyone,
+            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
+            novato=discord.PermissionOverwrite(
+                view_channel=True,
+                read_message_history=True,
+                send_messages=True,
+                add_reactions=True,
+                attach_files=False,
+                create_public_threads=False,
+                create_private_threads=False,
+            ),
+            bot=discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+            ),
+            novato_role=novato_role,
+            bot_member=bot_member,
+        )
+        deliveries_write = self._overwrites(
+            everyone_role=everyone,
+            everyone_overwrite=discord.PermissionOverwrite(view_channel=False),
+            novato=discord.PermissionOverwrite(
+                view_channel=True,
+                read_message_history=True,
+                send_messages=True,
+                add_reactions=False,
+                attach_files=True,
+                create_public_threads=False,
+                create_private_threads=False,
+            ),
+            bot=discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+            ),
+            novato_role=novato_role,
+            bot_member=bot_member,
+        )
+
+        start_category = await self._get_or_create_category(guild, "🎮 START", overwrites=public_read)
         game_category = await self._get_or_create_category(
             guild,
             "🐍 PYTHON.GAME",
@@ -41,14 +123,14 @@ class SetupCog(commands.Cog):
             },
         )
 
-        welcome = await self._get_or_create_text(guild, start_category, "👋-boas-vindas")
-        how_it_works = await self._get_or_create_text(guild, start_category, "🧭-como-funciona")
-        start = await self._get_or_create_text(guild, start_category, "✅-iniciar-jornada")
-        chat = await self._get_or_create_text(guild, game_category, "💬-chat-da-guilda")
-        trail = await self._get_or_create_text(guild, game_category, "🐍-trilha-python")
-        deliveries = await self._get_or_create_text(guild, game_category, "📦-entregas")
-        ranking = await self._get_or_create_text(guild, game_category, "🏆-ranking")
-        achievements = await self._get_or_create_text(guild, game_category, "📜-conquistas")
+        welcome = await self._get_or_create_text(guild, start_category, "👋-boas-vindas", public_read)
+        how_it_works = await self._get_or_create_text(guild, start_category, "🧭-como-funciona", public_read)
+        start = await self._get_or_create_text(guild, start_category, "✅-iniciar-jornada", public_read)
+        chat = await self._get_or_create_text(guild, game_category, "💬-chat-da-guilda", guild_chat)
+        trail = await self._get_or_create_text(guild, game_category, "🐍-trilha-python", onboarded_read)
+        deliveries = await self._get_or_create_text(guild, game_category, "📦-entregas", deliveries_write)
+        ranking = await self._get_or_create_text(guild, game_category, "🏆-ranking", onboarded_read)
+        achievements = await self._get_or_create_text(guild, game_category, "📜-conquistas", onboarded_read)
 
         silent = await self._get_or_create_voice(
             guild,
@@ -80,7 +162,7 @@ class SetupCog(commands.Cog):
             "3. Estude pelo objetivo da missao\n"
             "4. Entregue seu codigo\n"
             "5. Ganhe XP e desbloqueie ranks\n\n"
-            "Links de estudo sao bonus. A jornada funciona mesmo antes deles serem cadastrados."
+            "A jornada funciona pelo mapa de missoes, entregas e feedback."
         )
         await start.send("✅ Use `/iniciar nome:<seu_nome_de_aventureiro>` para abrir o mapa da Guilda.")
 
@@ -122,11 +204,14 @@ class SetupCog(commands.Cog):
         guild: discord.Guild,
         category: discord.CategoryChannel,
         name: str,
+        overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] | None = None,
     ) -> discord.TextChannel:
         existing = discord.utils.get(guild.text_channels, name=name)
         if existing:
+            if overwrites:
+                await existing.edit(category=category, overwrites=overwrites)
             return existing
-        return await guild.create_text_channel(name=name, category=category)
+        return await guild.create_text_channel(name=name, category=category, overwrites=overwrites)
 
     async def _get_or_create_voice(
         self,
@@ -142,3 +227,21 @@ class SetupCog(commands.Cog):
             return existing
         return await guild.create_voice_channel(name=name, category=category, overwrites=overwrites)
 
+    @staticmethod
+    def _overwrites(
+        *,
+        everyone_role: discord.Role,
+        everyone_overwrite: discord.PermissionOverwrite,
+        bot_member: discord.Member | None,
+        novato_role: discord.Role | None = None,
+        novato: discord.PermissionOverwrite | None = None,
+        bot: discord.PermissionOverwrite | None = None,
+    ) -> dict[discord.abc.Snowflake, discord.PermissionOverwrite]:
+        overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] = {
+            everyone_role: everyone_overwrite
+        }
+        if novato_role and novato:
+            overwrites[novato_role] = novato
+        if bot_member and bot:
+            overwrites[bot_member] = bot
+        return overwrites

@@ -132,3 +132,21 @@ def test_database_records_player_submission_and_ranking(tmp_path: Path) -> None:
     assert submission.first_completion is True
     assert updated.xp == 100
     assert database.leaderboard(10)[0].hero_name == "Maga dos Dados"
+
+
+def test_database_records_moderation_events(tmp_path: Path) -> None:
+    database = GameDatabase(tmp_path / "game.sqlite3")
+
+    database.add_moderation_event(
+        guild_id=10,
+        discord_id=1,
+        action="spam",
+        reason="Muitas mensagens em poucos segundos.",
+        message_excerpt="mensagem repetida",
+    )
+
+    events = database.moderation_events_for_user(10, 1)
+
+    assert database.moderation_event_count(10, 1) == 1
+    assert events[0]["action"] == "spam"
+    assert events[0]["reason"] == "Muitas mensagens em poucos segundos."

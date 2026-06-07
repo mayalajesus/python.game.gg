@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 
 from python_game.cogs.onboarding import OnboardingCog
+from python_game.cogs.moderation import ModerationCog
 from python_game.cogs.setup import SetupCog
 from python_game.cogs.trail import TrailCog
 from python_game.content_repository import ContentRepository
@@ -32,6 +33,7 @@ class PythonGameBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         await self.add_cog(SetupCog(self, self.database))
+        await self.add_cog(ModerationCog(self, self.database))
         await self.add_cog(OnboardingCog(self, self.contents, self.database))
         await self.add_cog(TrailCog(self, self.contents, self.database))
 
