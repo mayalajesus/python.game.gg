@@ -2,11 +2,11 @@
     "total":  34,
     "conteudos":  [
                       {
-                          "id":  "onboarding_entrada_guilda",
-                          "titulo":  "Entrada na Guilda",
+                          "id":  "ambiente_desenvolvimento",
+                          "titulo":  "Missao 0 - Ambiente de Desenvolvimento",
                           "modulo":  "modulo-00-onboarding",
                           "semana":  0,
-                          "arquivo":  "modulo-00-onboarding/onboarding_entrada_guilda.json"
+                          "arquivo":  "modulo-00-onboarding/ambiente_desenvolvimento.json"
                       },
                       {
                           "id":  "terminal_linguagem_maquinas",

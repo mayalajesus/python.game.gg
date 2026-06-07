@@ -140,41 +140,41 @@ Quando o aluno errar, o bot deve identificar o tipo de erro e recomendar reforco
 
 # Cronograma Completo
 
-## Semana 0 - Onboarding: Entrada na Guilda
+## Semana 0 - Missao 0: Ambiente de Desenvolvimento
 
 Rank inicial: 🥚 Novato
 
 Objetivo:
-Preparar o aluno para a experiencia, explicar regras, formato de entrega, XP, cargos e portfolio.
+Preparar o ambiente local de desenvolvimento com as ferramentas base para Python, APIs, Git, containers e bancos de dados.
 
 Conteudos:
 
-- Como funciona o python.game
-- Como ganhar XP
-- Como enviar exercicios
-- Como pedir ajuda
-- Como registrar projetos no portfolio
-- Como usar GitHub durante a jornada
+- Instalar o kit de ferramentas de desenvolvimento
+- Validar Python e Git no terminal
+- Abrir o Visual Studio Code
+- Confirmar acesso a GitHub Desktop, Postman, Docker e DBeaver
+- Entender para que cada ferramenta sera usada durante a jornada
 
 Missao principal:
 
-**Juramento da Guilda**
+**Kit Inicial do Desenvolvedor**
 
-O aluno deve concluir o onboarding, aceitar as regras, escolher um nome de aventureiro e receber o cargo inicial.
+O aluno deve preparar o ambiente usando o setup de desenvolvedor back-end e registrar quais ferramentas conseguiu instalar.
 
 Recomendacao do bot:
 
-- Ler o canal de boas-vindas
-- Ler o canal como-funciona
-- Fazer o comando `/iniciar`
-- Fazer uma entrega teste no formato correto
+- Baixar o setup completo em `https://www.dotset.co/setups/desenvolvedor-back-end`
+- Conferir os apps incluidos: Visual Studio Code, Postman, GitHub Desktop, Docker, DBeaver Community, Notion, Node.js, Python, Git, PostgreSQL e SQLite
+- Validar no terminal os comandos `python --version` e `git --version`
+- Enviar a entrega no modelo pedido
 
 Validacao:
 
-- Confirmou onboarding
-- Recebeu cargo 🥚 Novato
-- Entendeu o formato de entrega
-- Foi registrado no sistema de XP
+- Ambiente de desenvolvimento preparado
+- Python instalado
+- Git instalado
+- Editor de codigo aberto
+- Ferramentas principais reconhecidas pelo aluno
 
 ---
 

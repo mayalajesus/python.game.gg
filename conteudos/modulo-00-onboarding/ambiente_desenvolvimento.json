@@ -1,20 +1,28 @@
 ﻿{
-    "id":  "onboarding_entrada_guilda",
-    "titulo":  "Entrada na Guilda",
+    "id":  "ambiente_desenvolvimento",
+    "titulo":  "Missao 0 - Ambiente de Desenvolvimento",
     "modulo":  "modulo-00-onboarding",
     "semana":  0,
     "ordem":  0,
-    "nivel":  "Onboarding",
-    "objetivo":  "Entender como funciona o python.game e concluir a entrada na guilda.",
+    "nivel":  "Preparacao",
+    "objetivo":  "Preparar o ambiente local de desenvolvimento instalando as ferramentas base para Python, APIs, Git, containers e bancos de dados.",
     "conceitos":  [
-                      "jornada",
-                      "xp",
-                      "cargos",
-                      "formato de entrega",
-                      "portfolio"
+                      "instalacao",
+                      "python",
+                      "vscode",
+                      "git",
+                      "github",
+                      "postman",
+                      "docker",
+                      "dbeaver",
+                      "notion",
+                      "nodejs",
+                      "postgresql",
+                      "sqlite",
+                      "ambiente de desenvolvimento"
                   ],
-    "projeto_relacionado":  "Juramento da Guilda",
-    "xp_sugerido":  50,
+    "projeto_relacionado":  "Kit Inicial do Desenvolvedor",
+    "xp_sugerido":  100,
     "recomendacoes":  {
                           "pdfs":  [
 
@@ -38,14 +46,14 @@
 
                                            ],
                           "ferramentas":  [
-
+                                             "https://www.dotset.co/setups/desenvolvedor-back-end"
                                           ],
                           "outros":  [
-
+                                          "Apps incluidos no kit: Visual Studio Code, Postman, GitHub Desktop, Docker, DBeaver Community, Notion, Node.js, Python, Git, PostgreSQL e SQLite."
                                      ]
                       },
     "entrega":  {
-                    "formato_obrigatorio":  "/entregar desafio_id: onboarding_entrada_guilda",
+                    "formato_obrigatorio":  "/entregar desafio_id: ambiente_desenvolvimento",
                     "exigir_codigo":  true,
                     "exigir_explicacao":  true,
                     "exigir_repositorio":  false

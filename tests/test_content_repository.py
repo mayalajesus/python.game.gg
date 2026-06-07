@@ -17,7 +17,7 @@ def test_loads_content_index() -> None:
     contents = repository.list_contents()
 
     assert len(contents) >= 30
-    assert contents[0]["id"] == "onboarding_entrada_guilda"
+    assert contents[0]["id"] == "ambiente_desenvolvimento"
 
 
 def test_loads_single_content() -> None:
