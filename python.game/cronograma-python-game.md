@@ -199,7 +199,7 @@ Missoes:
 - Base da Guilda: criar estrutura de pastas pelo terminal
 - Teste da Lamina: configurar Python e VS Code
 - Banner da Taverna: primeiro script com `print()`
-- Codex de Regras: comentarios no codigo
+- Grimorio de Regras: comentarios no codigo
 - Inventario Inicial: variaveis de personagem
 
 Recomendacoes do bot:
@@ -1226,7 +1226,7 @@ Funcoes durante o cronograma:
 - Mostrar criterio de aprovacao
 - Validar formato da entrega
 - Executar testes automaticos quando possivel
-- Usar IA para avaliar legibilidade, organizacao e uso dos conceitos
+- Usar avaliador inteligente para analisar legibilidade, organizacao e uso dos conceitos
 - Dar feedback objetivo
 - Recomendar reforco personalizado
 - Registrar XP
@@ -1245,7 +1245,7 @@ Funcoes durante o cronograma:
 5. Aluno envia no formato correto
 6. Bot valida formato
 7. Bot executa testes
-8. IA avalia qualidade
+8. Avaliador inteligente analisa qualidade
 9. Bot retorna feedback
 10. Bot registra XP ou pede ajuste
 ```
