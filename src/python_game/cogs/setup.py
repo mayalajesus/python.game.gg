@@ -195,9 +195,11 @@ class SetupCog(commands.Cog):
         existing = discord.utils.get(guild.categories, name=name)
         if existing:
             if overwrites:
-                await existing.edit(overwrites=overwrites)
+                await existing.edit(overwrites=dict(overwrites))
             return existing
-        return await guild.create_category(name=name, overwrites=overwrites)
+        if overwrites:
+            return await guild.create_category(name=name, overwrites=dict(overwrites))
+        return await guild.create_category(name=name)
 
     async def _get_or_create_text(
         self,
@@ -209,9 +211,11 @@ class SetupCog(commands.Cog):
         existing = discord.utils.get(guild.text_channels, name=name)
         if existing:
             if overwrites:
-                await existing.edit(category=category, overwrites=overwrites)
+                await existing.edit(category=category, overwrites=dict(overwrites))
             return existing
-        return await guild.create_text_channel(name=name, category=category, overwrites=overwrites)
+        if overwrites:
+            return await guild.create_text_channel(name=name, category=category, overwrites=dict(overwrites))
+        return await guild.create_text_channel(name=name, category=category)
 
     async def _get_or_create_voice(
         self,
@@ -223,9 +227,11 @@ class SetupCog(commands.Cog):
         existing = discord.utils.get(guild.voice_channels, name=name)
         if existing:
             if overwrites:
-                await existing.edit(overwrites=overwrites)
+                await existing.edit(overwrites=dict(overwrites))
             return existing
-        return await guild.create_voice_channel(name=name, category=category, overwrites=overwrites)
+        if overwrites:
+            return await guild.create_voice_channel(name=name, category=category, overwrites=dict(overwrites))
+        return await guild.create_voice_channel(name=name, category=category)
 
     @staticmethod
     def _overwrites(
