@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from python_game.content_repository import ContentRepository, format_recommendations
+from python_game.cogs.trail import TrailCog
+from python_game.content_repository import ContentRepository, compact_recommendations, format_recommendations
 from python_game.database import GameDatabase
 from python_game.delivery_validation import validate_delivery_format
 from python_game.evaluator import evaluate_submission
@@ -18,6 +19,12 @@ def test_loads_content_index() -> None:
 
     assert len(contents) >= 30
     assert contents[0]["id"] == "ambiente_desenvolvimento"
+
+
+def test_safe_content_id_falls_back_to_first_content() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+
+    assert repository.safe_content_id("onboarding_entrada_guilda") == "ambiente_desenvolvimento"
 
 
 def test_loads_single_content() -> None:
@@ -37,6 +44,26 @@ def test_empty_recommendations_do_not_announce_missing_materials() -> None:
 
     assert "Ainda nao existem" not in message
     assert "Nenhum link" not in message
+
+
+def test_environment_mission_exposes_dotset_link() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    content = repository.get_content("ambiente_desenvolvimento")
+
+    message = format_recommendations(content)
+    compact = "\n".join(compact_recommendations(content))
+
+    assert "https://www.dotset.co/setups/desenvolvedor-back-end" in message
+    assert "https://www.dotset.co/setups/desenvolvedor-back-end" in compact
+
+
+def test_environment_mission_renders_as_mission_zero() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    content = repository.get_content("ambiente_desenvolvimento")
+
+    embed = TrailCog._mission_feed_embed(content)
+
+    assert "MISSÃO 00" in embed.title
 
 
 def test_content_files_do_not_expose_extra_manual_fields() -> None:
@@ -60,20 +87,21 @@ def test_content_files_do_not_expose_extra_manual_fields() -> None:
 
 def test_validates_expected_delivery_format() -> None:
     result = validate_delivery_format(
-        """/entregar desafio_id: fundamentos_01
+        """/entregar desafio_id: ambiente_desenvolvimento
 
 Codigo:
 ```python
-print("ola guilda")
+python --version
+git --version
 ```
 
 Explicacao:
-Este codigo imprime uma mensagem inicial no terminal.
+Validei o ambiente de desenvolvimento no terminal.
 """
     )
 
     assert result.is_valid is True
-    assert result.challenge_id == "fundamentos_01"
+    assert result.challenge_id == "ambiente_desenvolvimento"
 
 
 def test_rejects_delivery_without_required_format() -> None:
@@ -94,6 +122,38 @@ def test_evaluator_accepts_valid_intro_solution() -> None:
 
     assert result.accepted is True
     assert result.score >= 70
+
+
+def test_environment_evaluator_rejects_missing_commands_and_checklist() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    content = repository.get_content("ambiente_desenvolvimento")
+
+    result = evaluate_submission(
+        content,
+        "ok",
+        "Instalei tudo e deu certo.",
+    )
+
+    assert result.accepted is False
+    assert "python --version" in "\n".join(result.improvements)
+    assert "Visual Studio Code" in "\n".join(result.improvements)
+
+
+def test_environment_evaluator_accepts_full_setup_evidence() -> None:
+    repository = ContentRepository(ROOT / "conteudos" / "index-conteudos.json")
+    content = repository.get_content("ambiente_desenvolvimento")
+
+    result = evaluate_submission(
+        content,
+        "python --version\ngit --version",
+        (
+            "Checklist validado: Visual Studio Code, Postman, GitHub Desktop, Docker, "
+            "DBeaver Community, Notion, Node.js, Python, Git, PostgreSQL e SQLite."
+        ),
+    )
+
+    assert result.accepted is True
+    assert result.score == 100
 
 
 def test_database_records_player_submission_and_ranking(tmp_path: Path) -> None:

@@ -65,5 +65,10 @@ async def start_player_journey(
             rank_role=rank_role,
         )
 
-    content = contents.get_content(player.active_content_id or first_content_id)
+    active_content_id = contents.safe_content_id(player.active_content_id)
+    if active_content_id != player.active_content_id:
+        database.set_active_content(member.id, member.guild.id, active_content_id)
+        player = database.get_player_or_raise(member.id, member.guild.id)
+
+    content = contents.get_content(active_content_id)
     return JourneyStart(player=player, content=content, is_new_player=existing is None, xp_awarded=xp_awarded)

@@ -34,7 +34,7 @@ class PythonGameBot(commands.Bot):
 
     async def setup_hook(self) -> None:
         self.add_view(StartJourneyView(self.contents, self.database))
-        self.add_view(MissionFeedView(self.database))
+        self.add_view(MissionFeedView(self.database, self.contents))
 
         await self.add_cog(SetupCog(self, self.contents, self.database))
         await self.add_cog(ModerationCog(self, self.database))

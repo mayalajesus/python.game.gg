@@ -30,6 +30,14 @@ class ContentRepository:
     def first_content_id(self) -> str:
         return self.list_contents()[0]["id"]
 
+    def has_content(self, content_id: str | None) -> bool:
+        if not content_id:
+            return False
+        return any(content["id"] == content_id for content in self._index["conteudos"])
+
+    def safe_content_id(self, content_id: str | None) -> str:
+        return content_id if self.has_content(content_id) else self.first_content_id()
+
     def next_content_id(self, current_content_id: str) -> str | None:
         contents = self.list_contents()
         for index, item in enumerate(contents):
@@ -102,6 +110,32 @@ def format_recommendations(content: TrailContent) -> str:
         lines.append("")
 
     return "\n".join(lines).strip()
+
+
+def compact_recommendations(content: TrailContent, limit: int = 5) -> tuple[str, ...]:
+    labels = {
+        "ferramentas": "🧰 Ferramenta",
+        "documentacao": "📚 Documentacao",
+        "sites_oficiais": "🏛️ Site oficial",
+        "videos": "🎥 Video",
+        "artigos": "📰 Artigo",
+        "pdfs": "📄 PDF",
+        "cursos": "🎓 Curso",
+        "repositorios": "💻 Repositorio",
+        "outros": "✨ Apoio",
+    }
+    lines: list[str] = []
+    for key, label in labels.items():
+        for item in content.recommendations.get(key, []):
+            lines.append(f"{label}: {item}")
+            if len(lines) >= limit:
+                return tuple(lines)
+    return tuple(lines)
+
+
+def primary_recommendation(content: TrailContent) -> str | None:
+    recommendations = compact_recommendations(content, limit=1)
+    return recommendations[0] if recommendations else None
 
 
 def has_recommendation_links(content: TrailContent) -> bool:

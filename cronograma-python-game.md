@@ -79,11 +79,12 @@ O bot so deve corrigir exercicios enviados no modelo pedido.
 Modelo padrao:
 
 ````text
-/entregar desafio_id: fundamentos_01
+/entregar desafio_id: ambiente_desenvolvimento
 
 Codigo:
 ```python
-seu codigo aqui
+python --version
+git --version
 ```
 
 Explicacao:
@@ -102,11 +103,12 @@ Eu ainda nao posso corrigir esta missao.
 
 Envie novamente usando:
 
-/entregar desafio_id: fundamentos_01
+/entregar desafio_id: ambiente_desenvolvimento
 
 Codigo:
 ```python
-seu codigo aqui
+python --version
+git --version
 ```
 
 Explicacao:

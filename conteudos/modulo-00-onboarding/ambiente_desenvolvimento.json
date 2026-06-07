@@ -65,8 +65,22 @@
                       "organizacao":  true,
                       "formato_correto":  true,
                       "testes_automaticos":  [
-
-                                             ]
+                                                 "python --version",
+                                                 "git --version"
+                                             ],
+                      "checklist_obrigatorio":  [
+                                                    "Visual Studio Code",
+                                                    "Postman",
+                                                    "GitHub Desktop",
+                                                    "Docker",
+                                                    "DBeaver Community",
+                                                    "Notion",
+                                                    "Node.js",
+                                                    "Python",
+                                                    "Git",
+                                                    "PostgreSQL",
+                                                    "SQLite"
+                                                ]
                   },
     "status":  {
                    "ativo":  true

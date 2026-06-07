@@ -249,7 +249,7 @@ class SetupCog(commands.Cog):
         await self._replace_setup_embed(
             trail,
             self._mission_feed_embed(first_content),
-            view=MissionFeedView(self.database),
+            view=MissionFeedView(self.database, self.contents),
         )
         await self._replace_setup_embed(deliveries, self._deliveries_embed(), pin=True)
         await self._replace_setup_embed(ranking, self._ranking_embed())
@@ -460,7 +460,7 @@ class SetupCog(commands.Cog):
 
     @staticmethod
     def _mission_feed_embed(content: TrailContent) -> discord.Embed:
-        mission_number = max(1, content.order + 1)
+        mission_number = max(0, content.order)
         embed = discord.Embed(
             title=f"📜 MISSÃO {mission_number:02d}",
             description=(
@@ -479,13 +479,15 @@ class SetupCog(commands.Cog):
         embed = discord.Embed(
             title="📦 ▣ Entregas",
             description=(
-                "Envie suas missões neste formato:\n\n"
+                "Use este canal para registrar entregas em público. Depois use `/entregar` para correção, XP e progressão.\n\n"
+                "**1. Registro social:**\n"
                 "```text\n"
-                "Missão:\n"
-                "Github:\n"
-                "Observações:\n"
+                "Missão: ambiente_desenvolvimento\n"
+                "Github: sem repositorio\n"
+                "Observações: instalei o ambiente e validei as ferramentas.\n"
                 "```\n"
-                "Para correção técnica, XP e progressão automática, use o comando `/entregar`."
+                "**2. Correção:** envie `/entregar` com o mesmo `desafio_id`, suas evidências no campo `codigo` "
+                "e um checklist no campo `explicacao`."
             ),
             color=0xF2C94C,
         )

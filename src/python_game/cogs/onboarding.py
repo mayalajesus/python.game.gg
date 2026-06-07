@@ -45,26 +45,50 @@ class OnboardingCog(commands.Cog):
             embed=mission_embed(result.content, has_recommendation_links(result.content)),
             ephemeral=True,
         )
+        if result.is_new_player:
+            await self._announce_new_apprentice(guild, member, result.player.hero_name)
 
     @app_commands.command(name="formato", description="Mostra o modelo correto de entrega.")
     async def formato(self, interaction: discord.Interaction) -> None:
+        desafio_id = self.contents.first_content_id()
         await interaction.response.send_message(
             (
                 "📜 **Formato oficial de entrega**\n\n"
-                "O avaliador da Guilda só abre a correção quando a missão chega neste formato:\n\n"
-                "````text\n"
-                "/entregar desafio_id: fundamentos_01\n\n"
-                "Codigo:\n"
-                "```python\n"
-                "seu codigo aqui\n"
+                "**1. Registro social em `📦-entregas`:**\n"
+                "```text\n"
+                f"Missão: {desafio_id}\n"
+                "Github: sem repositorio\n"
+                "Observações: instalei o ambiente e validei as ferramentas.\n"
                 "```\n\n"
-                "Explicacao:\n"
-                "Explique em poucas linhas como sua solucao funciona.\n"
-                "````\n\n"
+                "**2. Correção e XP:** use `/entregar` e preencha:\n"
+                f"`desafio_id`: `{desafio_id}`\n"
+                "`codigo`: evidências, comandos usados ou código da missão\n"
+                "`explicacao`: checklist do que foi feito e como você validou\n\n"
                 "Clareza também faz parte da missão."
             ),
             ephemeral=True,
         )
+
+    async def _announce_new_apprentice(self, guild: discord.Guild, member: discord.Member, hero_name: str) -> None:
+        settings = self.database.guild_settings(guild.id)
+        channel_id = settings.get("announcements")
+        channel = guild.get_channel(channel_id) if channel_id else None
+        if not isinstance(channel, discord.TextChannel):
+            return
+
+        embed = discord.Embed(
+            title="🎒 Novo Aprendiz na Guilda",
+            description=(
+                f"{member.mention} entrou na campanha como **{hero_name}**.\n\n"
+                "O mapa acendeu, a primeira missão foi liberada e a Guilda ganhou mais uma pessoa construindo em público."
+            ),
+            color=0x44D07B,
+        )
+        embed.set_footer(text="python.game.gg • onboarding")
+        try:
+            await channel.send(embed=embed)
+        except discord.HTTPException:
+            pass
 
     @app_commands.command(name="perfil", description="Mostra seu perfil, XP, rank e progresso.")
     async def perfil(self, interaction: discord.Interaction) -> None:

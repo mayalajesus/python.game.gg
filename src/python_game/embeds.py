@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import discord
 
-from python_game.content_repository import TrailContent
+from python_game.content_repository import TrailContent, compact_recommendations
 from python_game.database import Player
 from python_game.ranks import next_rank_for_xp
 
@@ -28,7 +28,11 @@ def mission_embed(content: TrailContent, has_materials: bool) -> discord.Embed:
     embed.add_field(name="Recompensa base", value=f"{content.raw.get('xp_sugerido', 100)} XP", inline=True)
     embed.add_field(name="Artefato de portfolio", value=content.raw.get("projeto_relacionado", "Missao pratica"), inline=False)
     if has_materials:
-        embed.add_field(name="📚 Biblioteca da Guilda", value="Materiais de apoio disponiveis para este capitulo.", inline=False)
+        embed.add_field(
+            name="📚 Biblioteca da Guilda",
+            value="\n".join(compact_recommendations(content)) or "Materiais de apoio disponiveis para este capitulo.",
+            inline=False,
+        )
     embed.set_footer(text="python.game • uma missao por vez, um projeto por capitulo")
     return embed
 

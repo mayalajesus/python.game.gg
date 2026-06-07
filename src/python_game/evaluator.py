@@ -55,8 +55,27 @@ CONCEPT_HINTS: dict[str, tuple[str, ...]] = {
     "etl": ("extract", "transform", "load"),
 }
 
+ENVIRONMENT_MISSION_ID = "ambiente_desenvolvimento"
+ENVIRONMENT_COMMANDS = ("python --version", "git --version")
+ENVIRONMENT_APPS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Visual Studio Code", ("visual studio code", "vscode", "vs code")),
+    ("Postman", ("postman",)),
+    ("GitHub Desktop", ("github desktop",)),
+    ("Docker", ("docker",)),
+    ("DBeaver Community", ("dbeaver",)),
+    ("Notion", ("notion",)),
+    ("Node.js", ("node.js", "nodejs", "node --version")),
+    ("Python", ("python",)),
+    ("Git", ("git",)),
+    ("PostgreSQL", ("postgresql", "postgres")),
+    ("SQLite", ("sqlite",)),
+)
+
 
 def evaluate_submission(content: TrailContent, code: str, explanation: str) -> Evaluation:
+    if content.id == ENVIRONMENT_MISSION_ID:
+        return _evaluate_environment_setup(code, explanation)
+
     strengths: list[str] = []
     improvements: list[str] = []
     score = 35
@@ -115,6 +134,52 @@ def evaluate_submission(content: TrailContent, code: str, explanation: str) -> E
         feedback=feedback,
         strengths=tuple(strengths),
         improvements=tuple(improvements or ("Continue refinando a organizacao da solucao.",)),
+    )
+
+
+def _evaluate_environment_setup(code: str, explanation: str) -> Evaluation:
+    normalized_code = code.lower()
+    normalized_delivery = f"{code}\n{explanation}".lower()
+    missing_commands = [command for command in ENVIRONMENT_COMMANDS if command not in normalized_code]
+    missing_apps = [
+        app_name
+        for app_name, aliases in ENVIRONMENT_APPS
+        if not any(alias in normalized_delivery for alias in aliases)
+    ]
+
+    score = 100 - len(missing_commands) * 25 - len(missing_apps) * 4
+    score = max(0, min(score, 100))
+    accepted = not missing_commands and not missing_apps and len(explanation.strip()) >= 40
+
+    strengths: list[str] = []
+    improvements: list[str] = []
+    if not missing_commands:
+        strengths.append("Os comandos de validacao do ambiente foram informados.")
+    else:
+        improvements.append("Inclua no campo codigo: " + ", ".join(missing_commands) + ".")
+
+    if not missing_apps:
+        strengths.append("O checklist de apps do kit foi registrado.")
+    else:
+        improvements.append("Complete o checklist com: " + ", ".join(missing_apps[:6]) + ".")
+
+    if len(explanation.strip()) >= 40:
+        strengths.append("A explicacao mostra como o ambiente foi conferido.")
+    else:
+        improvements.append("Explique em poucas linhas como voce validou o ambiente.")
+
+    feedback = (
+        "Ambiente preparado. A Guilda registrou seu kit inicial de desenvolvimento."
+        if accepted
+        else "A missao de ambiente ainda pede evidencias. Complete o checklist e valide os comandos no terminal."
+    )
+
+    return Evaluation(
+        accepted=accepted,
+        score=score,
+        feedback=feedback,
+        strengths=tuple(strengths),
+        improvements=tuple(improvements),
     )
 
 

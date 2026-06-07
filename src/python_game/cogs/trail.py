@@ -50,7 +50,9 @@ class TrailCog(commands.Cog):
         guild = require_guild(interaction)
         member = require_member(interaction)
         player = self.database.get_player(member.id, guild.id)
-        content_id = id or (player.active_content_id if player else None) or self.contents.first_content_id()
+        content_id = id or self.contents.safe_content_id(player.active_content_id if player else None)
+        if id is None and player and content_id != player.active_content_id:
+            self.database.set_active_content(member.id, guild.id, content_id)
         try:
             content = self.contents.get_content(content_id)
         except KeyError:
@@ -74,7 +76,9 @@ class TrailCog(commands.Cog):
             )
             return
 
-        content_id = id or player.active_content_id or self.contents.first_content_id()
+        content_id = id or self.contents.safe_content_id(player.active_content_id)
+        if id is None and content_id != player.active_content_id:
+            self.database.set_active_content(member.id, guild.id, content_id)
         try:
             content = self.contents.get_content(content_id)
         except KeyError:
@@ -154,7 +158,12 @@ class TrailCog(commands.Cog):
             evaluation.strengths,
             evaluation.improvements,
         )
-        reward = f"\nRecompensa registrada: **+{xp_awarded} XP**" if xp_awarded else "\nRecompensa registrada: **+0 XP**"
+        if xp_awarded:
+            reward = f"\nRecompensa registrada: **+{xp_awarded} XP**"
+        elif evaluation.accepted:
+            reward = "\nMissão já concluída antes. XP não foi duplicado."
+        else:
+            reward = "\nXP será registrado quando a missão for aprovada."
         await interaction.response.send_message(
             evaluation.feedback + reward + new_rank_message,
             embed=embed,
@@ -205,7 +214,9 @@ class TrailCog(commands.Cog):
                 ephemeral=True,
             )
             return
-        content_id = desafio_id or player.active_content_id or self.contents.first_content_id()
+        content_id = desafio_id or self.contents.safe_content_id(player.active_content_id)
+        if desafio_id is None and content_id != player.active_content_id:
+            self.database.set_active_content(member.id, guild.id, content_id)
         self.database.add_project(
             discord_id=member.id,
             guild_id=guild.id,
@@ -322,7 +333,7 @@ class TrailCog(commands.Cog):
 
         embed = self._mission_feed_embed(content)
         embed.set_footer(text=marker)
-        await channel.send(embed=embed, view=MissionFeedView(self.database))
+        await channel.send(embed=embed, view=MissionFeedView(self.database, self.contents))
 
     def _configured_text_channel(self, guild: discord.Guild, key: str) -> discord.TextChannel | None:
         settings = self.database.guild_settings(guild.id)
@@ -332,7 +343,7 @@ class TrailCog(commands.Cog):
 
     @staticmethod
     def _mission_feed_embed(content: TrailContent) -> discord.Embed:
-        mission_number = max(1, content.order + 1)
+        mission_number = max(0, content.order)
         embed = discord.Embed(
             title=f"📜 MISSÃO {mission_number:02d}",
             description=(
@@ -351,8 +362,11 @@ class TrailCog(commands.Cog):
         if message.author.bot or message.guild is None:
             return
         if self._is_delivery_channel(message) and self._looks_like_delivery_card(message.content):
+            challenge_id = self._delivery_card_challenge_id(message.content)
+            challenge_line = f" com `desafio_id: {challenge_id}`" if challenge_id else " com o mesmo `desafio_id`"
             await message.reply(
-                "📦 Entrega recebida no modelo da Guilda. Para correção técnica, XP e progressão automática, use também `/entregar`.",
+                "📦 Registro social recebido. Para correção técnica, XP e progressão automática, use `/entregar`"
+                f"{challenge_line}, evidências no campo `codigo` e checklist no campo `explicacao`.",
                 mention_author=False,
             )
             return
@@ -381,3 +395,13 @@ class TrailCog(commands.Cog):
             and "github:" in normalized
             and ("observações:" in normalized or "observacoes:" in normalized)
         )
+
+    @staticmethod
+    def _delivery_card_challenge_id(content: str) -> str | None:
+        for line in content.splitlines():
+            normalized = line.strip()
+            if normalized.lower().startswith(("missão:", "missao:")):
+                _, value = normalized.split(":", maxsplit=1)
+                challenge_id = value.strip()
+                return challenge_id or None
+        return None

@@ -410,9 +410,9 @@ Se uma missão não tiver links cadastrados, o bot segue normalmente sem avisar 
 No canal `📦-entregas`, o modelo social é:
 
 ```text
-Missão:
-Github:
-Observações:
+Missão: ambiente_desenvolvimento
+Github: sem repositorio
+Observações: instalei o ambiente e validei as ferramentas.
 ```
 
 Para correção técnica, XP e progressão automática, use:
@@ -427,6 +427,15 @@ Campos esperados:
 - `codigo`
 - `explicacao`
 - `repositorio`, opcional
+
+Na missão 0, o campo `codigo` deve trazer as evidências:
+
+```text
+python --version
+git --version
+```
+
+E o campo `explicacao` deve listar o checklist dos apps instalados.
 
 O bot só inicia a correção quando a entrega chega no modelo esperado.
 
