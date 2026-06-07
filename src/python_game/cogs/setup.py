@@ -11,6 +11,20 @@ from python_game.views import MissionFeedView, PortalView, StartJourneyView
 
 
 SETUP_MARKER = "python.game.gg • setup"
+LEGACY_SETUP_MARKERS = {
+    SETUP_MARKER,
+    "python.game.gg â€¢ setup",
+}
+LEGACY_SETUP_TEXT = (
+    "Próximo portal",
+    "Proximo portal",
+    "Siga para",
+    "O portão da Guilda se abriu",
+    "O portao da Guilda se abriu",
+    "Como a campanha funciona",
+    "Acenda sua primeira missão",
+    "Acenda sua primeira missao",
+)
 
 
 class SetupCog(commands.Cog):
@@ -359,11 +373,7 @@ class SetupCog(commands.Cog):
             try:
                 await channel.purge(
                     limit=30,
-                    check=lambda message: (
-                        message.author == channel.guild.me
-                        and bool(message.embeds)
-                        and message.embeds[0].footer.text == SETUP_MARKER
-                    ),
+                    check=self._is_setup_message,
                 )
             except discord.HTTPException:
                 pass
@@ -378,6 +388,18 @@ class SetupCog(commands.Cog):
         return message
 
     @staticmethod
+    def _is_setup_message(message: discord.Message) -> bool:
+        if message.guild is None or message.author != message.guild.me or not message.embeds:
+            return False
+        embed = message.embeds[0]
+        footer = embed.footer.text or ""
+        title = embed.title or ""
+        description = embed.description or ""
+        field_text = "\n".join(f"{field.name}\n{field.value}" for field in embed.fields)
+        searchable = f"{title}\n{description}\n{field_text}"
+        return footer in LEGACY_SETUP_MARKERS or any(fragment in searchable for fragment in LEGACY_SETUP_TEXT)
+
+    @staticmethod
     def _welcome_embed(next_channel: discord.TextChannel) -> discord.Embed:
         embed = discord.Embed(
             title="🏰 ▣ Bem-vindo à Python.Game",
@@ -385,7 +407,7 @@ class SetupCog(commands.Cog):
                 "Você acaba de entrar em uma Guilda onde cada desafio gera experiência, "
                 "cada projeto fortalece suas habilidades e cada conquista marca sua evolução.\n\n"
                 "**Sua jornada começa agora.**\n\n"
-                f"⬇️ Clique em **Continuar** para seguir até {next_channel.mention}."
+                "Use o botão abaixo para abrir o próximo portal."
             ),
             color=0x44D07B,
         )
@@ -407,7 +429,6 @@ class SetupCog(commands.Cog):
             ),
             color=0x4EA5FF,
         )
-        embed.add_field(name="Próximo passo", value=f"Clique em **Iniciar Jornada** para chegar em {next_channel.mention}.", inline=False)
         return embed
 
     @staticmethod
