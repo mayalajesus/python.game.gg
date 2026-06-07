@@ -25,7 +25,19 @@ class ContentRepository:
         self._index = self._load_index()
 
     def list_contents(self) -> list[dict[str, Any]]:
-        return sorted(self._index["conteudos"], key=lambda item: item["semana"])
+        return list(self._index["conteudos"])
+
+    def first_content_id(self) -> str:
+        return self.list_contents()[0]["id"]
+
+    def next_content_id(self, current_content_id: str) -> str | None:
+        contents = self.list_contents()
+        for index, item in enumerate(contents):
+            if item["id"] == current_content_id:
+                if index + 1 >= len(contents):
+                    return None
+                return contents[index + 1]["id"]
+        return None
 
     def get_content(self, content_id: str) -> TrailContent:
         item = next(
@@ -93,3 +105,7 @@ def format_recommendations(content: TrailContent) -> str:
         lines.append("Ainda nao existem links cadastrados para este conteudo.")
 
     return "\n".join(lines).strip()
+
+
+def has_recommendation_links(content: TrailContent) -> bool:
+    return any(bool(links) for links in content.recommendations.values())

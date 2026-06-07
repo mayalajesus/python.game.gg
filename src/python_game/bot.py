@@ -7,8 +7,10 @@ import discord
 from discord.ext import commands
 
 from python_game.cogs.onboarding import OnboardingCog
+from python_game.cogs.setup import SetupCog
 from python_game.cogs.trail import TrailCog
 from python_game.content_repository import ContentRepository
+from python_game.database import GameDatabase
 from python_game.settings import load_settings
 
 
@@ -26,10 +28,12 @@ class PythonGameBot(commands.Bot):
 
         self.settings = settings
         self.contents = ContentRepository(settings.content_index_path)
+        self.database = GameDatabase(settings.database_path)
 
     async def setup_hook(self) -> None:
-        await self.add_cog(OnboardingCog(self))
-        await self.add_cog(TrailCog(self, self.contents))
+        await self.add_cog(SetupCog(self, self.database))
+        await self.add_cog(OnboardingCog(self, self.contents, self.database))
+        await self.add_cog(TrailCog(self, self.contents, self.database))
 
         if self.settings.discord_guild_id:
             guild = discord.Object(id=int(self.settings.discord_guild_id))

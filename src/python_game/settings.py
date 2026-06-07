@@ -14,6 +14,7 @@ class Settings:
     discord_guild_id: str
     command_prefix: str
     content_index_path: Path
+    database_path: Path
 
 
 def load_settings() -> Settings:
@@ -28,10 +29,16 @@ def load_settings() -> Settings:
     if not content_index_path.is_absolute():
         content_index_path = project_dir / content_index_path
 
+    raw_database_path = os.getenv("DATABASE_PATH", "data/python_game.sqlite3")
+    database_path = Path(raw_database_path)
+    if not database_path.is_absolute():
+        database_path = project_dir / database_path
+
     return Settings(
         discord_bot_token=os.getenv("DISCORD_BOT_TOKEN", ""),
         discord_client_id=os.getenv("DISCORD_CLIENT_ID", ""),
         discord_guild_id=os.getenv("DISCORD_GUILD_ID", ""),
         command_prefix=os.getenv("COMMAND_PREFIX", "/"),
         content_index_path=content_index_path.resolve(),
+        database_path=database_path.resolve(),
     )
