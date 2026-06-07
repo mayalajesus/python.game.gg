@@ -24,7 +24,7 @@ class SetupCog(commands.Cog):
         everyone = guild.default_role
         bot_member = guild.me
 
-        public_read = self._overwrites(
+        start_read_only = self._overwrites(
             everyone_role=everyone,
             everyone_overwrite=discord.PermissionOverwrite(
                 view_channel=True,
@@ -33,12 +33,34 @@ class SetupCog(commands.Cog):
                 add_reactions=False,
                 create_public_threads=False,
                 create_private_threads=False,
+                use_application_commands=False,
             ),
             bot=discord.PermissionOverwrite(
                 view_channel=True,
                 send_messages=True,
                 manage_messages=True,
                 read_message_history=True,
+                use_application_commands=True,
+            ),
+            bot_member=bot_member,
+        )
+        start_action = self._overwrites(
+            everyone_role=everyone,
+            everyone_overwrite=discord.PermissionOverwrite(
+                view_channel=True,
+                read_message_history=True,
+                send_messages=False,
+                add_reactions=False,
+                create_public_threads=False,
+                create_private_threads=False,
+                use_application_commands=True,
+            ),
+            bot=discord.PermissionOverwrite(
+                view_channel=True,
+                send_messages=True,
+                manage_messages=True,
+                read_message_history=True,
+                use_application_commands=True,
             ),
             bot_member=bot_member,
         )
@@ -105,7 +127,7 @@ class SetupCog(commands.Cog):
             bot_member=bot_member,
         )
 
-        start_category = await self._get_or_create_category(guild, "🎮 START", overwrites=public_read)
+        start_category = await self._get_or_create_category(guild, "🎮 START", overwrites=start_read_only)
         game_category = await self._get_or_create_category(
             guild,
             "🐍 PYTHON.GAME",
@@ -123,9 +145,30 @@ class SetupCog(commands.Cog):
             },
         )
 
-        welcome = await self._get_or_create_text(guild, start_category, "👋-boas-vindas", public_read)
-        how_it_works = await self._get_or_create_text(guild, start_category, "🧭-como-funciona", public_read)
-        start = await self._get_or_create_text(guild, start_category, "✅-iniciar-jornada", public_read)
+        welcome = await self._get_or_create_text(
+            guild,
+            start_category,
+            "01-👋-bem-vindo",
+            start_read_only,
+            aliases=("👋-boas-vindas", "👋-bem-vindo", "boas-vindas", "bem-vindo"),
+            position=0,
+        )
+        how_it_works = await self._get_or_create_text(
+            guild,
+            start_category,
+            "02-🧭-como-funciona",
+            start_read_only,
+            aliases=("🧭-como-funciona", "como-funciona"),
+            position=1,
+        )
+        start = await self._get_or_create_text(
+            guild,
+            start_category,
+            "03-✅-iniciar-jornada",
+            start_action,
+            aliases=("✅-iniciar-jornada", "iniciar-jornada"),
+            position=2,
+        )
         chat = await self._get_or_create_text(guild, game_category, "💬-chat-da-guilda", guild_chat)
         trail = await self._get_or_create_text(guild, game_category, "🐍-trilha-python", onboarded_read)
         deliveries = await self._get_or_create_text(guild, game_category, "📦-entregas", deliveries_write)
@@ -151,8 +194,8 @@ class SetupCog(commands.Cog):
             },
         )
 
-        await self._replace_setup_embed(welcome, self._welcome_embed())
-        await self._replace_setup_embed(how_it_works, self._how_it_works_embed())
+        await self._replace_setup_embed(welcome, self._welcome_embed(how_it_works))
+        await self._replace_setup_embed(how_it_works, self._how_it_works_embed(start))
         await self._replace_setup_embed(start, self._start_embed())
 
         self.database.save_guild_setup(
@@ -197,15 +240,21 @@ class SetupCog(commands.Cog):
         category: discord.CategoryChannel,
         name: str,
         overwrites: dict[discord.abc.Snowflake, discord.PermissionOverwrite] | None = None,
+        aliases: tuple[str, ...] = (),
+        position: int | None = None,
     ) -> discord.TextChannel:
-        existing = discord.utils.get(guild.text_channels, name=name)
+        existing = self._find_text_channel(guild, (name, *aliases))
         if existing:
+            edit_options: dict[str, object] = {"name": name, "category": category}
             if overwrites:
-                await existing.edit(category=category, overwrites=dict(overwrites))
+                edit_options["overwrites"] = dict(overwrites)
+            if position is not None:
+                edit_options["position"] = position
+            await existing.edit(**edit_options)
             return existing
         if overwrites:
-            return await guild.create_text_channel(name=name, category=category, overwrites=dict(overwrites))
-        return await guild.create_text_channel(name=name, category=category)
+            return await guild.create_text_channel(name=name, category=category, overwrites=dict(overwrites), position=position)
+        return await guild.create_text_channel(name=name, category=category, position=position)
 
     async def _get_or_create_voice(
         self,
@@ -242,9 +291,18 @@ class SetupCog(commands.Cog):
         await channel.send(embed=embed)
 
     @staticmethod
-    def _welcome_embed() -> discord.Embed:
+    @staticmethod
+    def _find_text_channel(guild: discord.Guild, names: tuple[str, ...]) -> discord.TextChannel | None:
+        for name in names:
+            channel = discord.utils.get(guild.text_channels, name=name)
+            if channel:
+                return channel
+        return None
+
+    @staticmethod
+    def _welcome_embed(next_channel: discord.TextChannel) -> discord.Embed:
         embed = discord.Embed(
-            title="🎮 O portão da Guilda se abriu",
+            title="🎮 ▣ O portão da Guilda se abriu",
             description=(
                 "Bem-vindo ao **python.game**.\n\n"
                 "Este servidor é o seu **mapa de campanha**: missões de Python, entregas reais, "
@@ -254,15 +312,16 @@ class SetupCog(commands.Cog):
             ),
             color=0x44D07B,
         )
-        embed.add_field(name="🧱 Comece pequeno", value="Um exercício, uma entrega, um avanço.", inline=True)
-        embed.add_field(name="⚔️ Evolua em público", value="Mostre progresso, peça ajuda e ajude outros membros.", inline=True)
+        embed.add_field(name="🟩 Comece pequeno", value="Um exercício. Uma entrega. Um avanço.", inline=True)
+        embed.add_field(name="🕹️ Evolua em público", value="Mostre progresso, peça ajuda e ajude outros membros.", inline=True)
         embed.add_field(name="💾 Construa algo real", value="Cada projeto vira parte da sua história profissional.", inline=False)
+        embed.add_field(name="➡️ Próximo portal", value=f"Siga para {next_channel.mention}. O chat deste canal fica fechado para manter o ritual limpo.", inline=False)
         return embed
 
     @staticmethod
-    def _how_it_works_embed() -> discord.Embed:
+    def _how_it_works_embed(next_channel: discord.TextChannel) -> discord.Embed:
         embed = discord.Embed(
-            title="🗺️ Como a campanha funciona",
+            title="🗺️ ▣ Como a campanha funciona",
             description=(
                 "**1.** Use `/iniciar` para gravar seu nome no Registro da Guilda.\n"
                 "**2.** Receba uma missão e leia o objetivo de campo.\n"
@@ -273,15 +332,16 @@ class SetupCog(commands.Cog):
             ),
             color=0x4EA5FF,
         )
-        embed.add_field(name="🕹️ Progressão", value="XP, ranks, missões e conquistas visíveis.", inline=True)
+        embed.add_field(name="🟦 Progressão", value="XP, ranks, missões e conquistas visíveis.", inline=True)
         embed.add_field(name="📜 Feedback", value="A entrega só conta quando chega no formato certo.", inline=True)
         embed.add_field(name="☕ Comunidade", value="Use o café para conversar e o quarto silencioso para foco.", inline=False)
+        embed.add_field(name="➡️ Próximo portal", value=f"Quando entender o fluxo, avance para {next_channel.mention}.", inline=False)
         return embed
 
     @staticmethod
     def _start_embed() -> discord.Embed:
         embed = discord.Embed(
-            title="✅ Acenda sua primeira missão",
+            title="✅ ▣ Acenda sua primeira missão",
             description=(
                 "Se você está pronto para entrar na campanha, use:\n\n"
                 "`/iniciar nome:<seu_nome_de_aventureiro>`\n\n"
@@ -289,8 +349,9 @@ class SetupCog(commands.Cog):
             ),
             color=0xF2C94C,
         )
-        embed.add_field(name="🥚 Primeiro cargo", value="Novato", inline=True)
+        embed.add_field(name="🟨 Primeiro cargo", value="🥚 Novato", inline=True)
         embed.add_field(name="🧭 Primeiro passo", value="Abrir o mapa da jornada", inline=True)
+        embed.add_field(name="⚔️ Depois disso", value="Leia sua missão ativa, entregue código e comece a ganhar XP.", inline=False)
         return embed
 
     @staticmethod
