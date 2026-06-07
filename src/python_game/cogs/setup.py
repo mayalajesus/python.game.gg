@@ -151,26 +151,9 @@ class SetupCog(commands.Cog):
             },
         )
 
-        await welcome.send(
-            "🎮 **O portao da Guilda se abriu.**\n\n"
-            "Bem-vindo ao **python.game**. Este servidor e o seu mapa de campanha: "
-            "missoes de Python, entregas reais, XP, ranks e projetos que viram portfolio.\n\n"
-            "Aqui ninguem avanca sozinho. A Guilda pergunta, responde, revisa, celebra progresso "
-            "e cresce junto, um desafio por vez."
-        )
-        await how_it_works.send(
-            "🧭 **Como a campanha funciona**\n\n"
-            "1. Use `/iniciar` para assinar o registro da Guilda.\n"
-            "2. Receba uma missao no seu mapa.\n"
-            "3. Escreva codigo, teste, erre, ajuste e aprenda.\n"
-            "4. Entregue sua solucao para receber feedback.\n"
-            "5. Ganhe XP, suba de rank e fortaleça seu portfolio.\n\n"
-            "O ritmo e simples: aparecer, praticar, entregar, ajudar e voltar mais forte."
-        )
-        await start.send(
-            "✅ **Pronto para entrar na campanha?**\n\n"
-            "Use `/iniciar nome:<seu_nome_de_aventureiro>` e a primeira missao acende no seu mapa."
-        )
+        await self._replace_setup_embed(welcome, self._welcome_embed())
+        await self._replace_setup_embed(how_it_works, self._how_it_works_embed())
+        await self._replace_setup_embed(start, self._start_embed())
 
         self.database.save_guild_setup(
             guild.id,
@@ -239,6 +222,76 @@ class SetupCog(commands.Cog):
         if overwrites:
             return await guild.create_voice_channel(name=name, category=category, overwrites=dict(overwrites))
         return await guild.create_voice_channel(name=name, category=category)
+
+    async def _replace_setup_embed(self, channel: discord.TextChannel, embed: discord.Embed) -> None:
+        marker = "python.game.gg • setup"
+        permissions = channel.permissions_for(channel.guild.me) if channel.guild.me else None
+        if permissions and permissions.manage_messages:
+            try:
+                await channel.purge(
+                    limit=20,
+                    check=lambda message: (
+                        message.author == channel.guild.me
+                        and bool(message.embeds)
+                        and message.embeds[0].footer.text == marker
+                    ),
+                )
+            except discord.HTTPException:
+                pass
+        embed.set_footer(text=marker)
+        await channel.send(embed=embed)
+
+    @staticmethod
+    def _welcome_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="🎮 O portão da Guilda se abriu",
+            description=(
+                "Bem-vindo ao **python.game**.\n\n"
+                "Este servidor é o seu **mapa de campanha**: missões de Python, entregas reais, "
+                "XP, ranks, projetos de portfólio e uma comunidade avançando junto.\n\n"
+                "Aqui ninguém evolui sozinho. A Guilda pergunta, responde, revisa, celebra progresso "
+                "e transforma prática em aventura, um desafio por vez."
+            ),
+            color=0x44D07B,
+        )
+        embed.add_field(name="🧱 Comece pequeno", value="Um exercício, uma entrega, um avanço.", inline=True)
+        embed.add_field(name="⚔️ Evolua em público", value="Mostre progresso, peça ajuda e ajude outros membros.", inline=True)
+        embed.add_field(name="💾 Construa algo real", value="Cada projeto vira parte da sua história profissional.", inline=False)
+        return embed
+
+    @staticmethod
+    def _how_it_works_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="🗺️ Como a campanha funciona",
+            description=(
+                "**1.** Use `/iniciar` para gravar seu nome no Registro da Guilda.\n"
+                "**2.** Receba uma missão e leia o objetivo de campo.\n"
+                "**3.** Escreva código, teste, erre, ajuste e aprenda.\n"
+                "**4.** Entregue sua solução para receber feedback.\n"
+                "**5.** Ganhe XP, suba de rank e fortaleça seu portfólio.\n\n"
+                "O ritmo da Guilda é simples: **aparecer, praticar, entregar, ajudar e voltar mais forte**."
+            ),
+            color=0x4EA5FF,
+        )
+        embed.add_field(name="🕹️ Progressão", value="XP, ranks, missões e conquistas visíveis.", inline=True)
+        embed.add_field(name="📜 Feedback", value="A entrega só conta quando chega no formato certo.", inline=True)
+        embed.add_field(name="☕ Comunidade", value="Use o café para conversar e o quarto silencioso para foco.", inline=False)
+        return embed
+
+    @staticmethod
+    def _start_embed() -> discord.Embed:
+        embed = discord.Embed(
+            title="✅ Acenda sua primeira missão",
+            description=(
+                "Se você está pronto para entrar na campanha, use:\n\n"
+                "`/iniciar nome:<seu_nome_de_aventureiro>`\n\n"
+                "A partir daí, o bot abre seu mapa, registra seu progresso e libera o primeiro capítulo."
+            ),
+            color=0xF2C94C,
+        )
+        embed.add_field(name="🥚 Primeiro cargo", value="Novato", inline=True)
+        embed.add_field(name="🧭 Primeiro passo", value="Abrir o mapa da jornada", inline=True)
+        return embed
 
     @staticmethod
     def _overwrites(
