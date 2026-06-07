@@ -30,6 +30,14 @@ class PythonGameBot(commands.Bot):
     async def setup_hook(self) -> None:
         await self.add_cog(OnboardingCog(self))
         await self.add_cog(TrailCog(self, self.contents))
+
+        if self.settings.discord_guild_id:
+            guild = discord.Object(id=int(self.settings.discord_guild_id))
+            self.tree.copy_global_to(guild=guild)
+            await self.tree.sync(guild=guild)
+            logger.info("Slash commands sincronizados para a guild %s", self.settings.discord_guild_id)
+            return
+
         await self.tree.sync()
 
     async def on_ready(self) -> None:
@@ -47,4 +55,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-

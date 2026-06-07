@@ -19,6 +19,11 @@ Ele deve funcionar como o nucleo da plataforma:
 python.game/
 ├─ pyproject.toml
 ├─ .env.example
+├─ cronograma-python-game.md
+├─ conteudos/
+│  ├─ index-conteudos.json
+│  ├─ schema-conteudo.json
+│  └─ modulo-*/
 ├─ src/python_game/
 │  ├─ bot.py
 │  ├─ settings.py
@@ -30,10 +35,10 @@ python.game/
    └─ test_content_repository.py
 ```
 
-Os conteudos recomendados ficam fora da pasta do bot, em:
+Os conteudos recomendados ficam dentro da pasta do projeto, em:
 
 ```text
-../conteudos/
+conteudos/
 ```
 
 O bot usa `conteudos/index-conteudos.json` para localizar os arquivos individuais de cada etapa da trilha.
@@ -43,9 +48,11 @@ O bot usa `conteudos/index-conteudos.json` para localizar os arquivos individuai
 Crie uma `.env` na raiz do workspace ou dentro de `python.game/` com:
 
 ```text
-DISCORD_TOKEN=seu_token_do_bot
-COMMAND_PREFIX=!
-CONTENT_INDEX_PATH=../conteudos/index-conteudos.json
+DISCORD_CLIENT_ID=id_do_app
+DISCORD_BOT_TOKEN=token_do_bot
+DISCORD_GUILD_ID=id_do_servidor_de_teste
+COMMAND_PREFIX=/
+CONTENT_INDEX_PATH=conteudos/index-conteudos.json
 ```
 
 ## Rodando localmente
@@ -77,4 +84,3 @@ Explique em poucas linhas como sua solucao funciona.
 ````
 
 Se o aluno enviar fora desse modelo, o bot nao deve corrigir a atividade.
-
